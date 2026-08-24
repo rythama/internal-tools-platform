@@ -1,0 +1,20 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+
+# This workflow is the contract with Devin. Every session's PR must pass it.
+# It is seeded BEFORE the first session deliberately — see docs/ARCHITECTURE.md §4.
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'npm' }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+      # Walks the hash chain of the seeded audit log and fails on the first break.
+      - run: npm run db:seed && npm run audit:verify
