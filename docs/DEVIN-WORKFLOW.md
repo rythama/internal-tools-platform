@@ -12,8 +12,14 @@ implementation inside it.**
 
 Everything in this repo authored before the first session — `docs/ARCHITECTURE.md`,
 `packages/core/src/db/schema.ts`, the contract in `packages/core/src/index.ts`,
-`.github/workflows/ci.yml` — is the guardrail. It took roughly 30 minutes and it is
-what makes agent-authored PRs reviewable in ~10 minutes instead of ~2 hours.
+`.github/workflows/ci.yml` — is the guardrail. It took roughly 30 minutes.
+
+An earlier draft claimed this made agent PRs "reviewable in ~10 minutes instead of ~2
+hours." That was an unmeasured 12x claim and it is withdrawn. What the guardrail
+actually does is make review **bounded and repeatable** — the same four things to check
+every time, with the mechanical invariants already proven by CI — rather than fast. The
+session log below is where the real numbers go, including the ones that do not flatter
+the approach.
 
 Skip this step and you get 13 inconsistent apps that each invented their own
 auth. That is the actual failure mode of "just have Devin build it," and it is

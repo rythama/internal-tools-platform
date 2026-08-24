@@ -13,8 +13,19 @@ tables, forms, and deploy from scratch.
 Those are fixed costs. We pay them **once**, in `packages/core`, and every
 subsequent tool becomes a spec file plus whatever custom React it genuinely needs.
 
-The design target is not "app #1 is cheap." It is **"app #11 is cheap, and app #11
-cannot violate the audit or access rules by accident."**
+> **Correction, after costing this properly.** An earlier draft of this document said
+> the design target was *"app #11 is cheap."* That premise did not survive the economic
+> analysis. Marginal per-tool cost lands around $40K fully loaded on this platform
+> versus roughly $39K to build the same tool properly in Power Apps — **parity**. Only
+> ~12% of per-tool work is agent-compressible; the rest is requirements elicitation,
+> security review, UAT, and cutover, none of which the architecture or the agent touches.
+>
+> The design target that survives is the second half: **app #11 cannot violate the
+> audit or access rules by accident.** That is a capability claim, not a cost claim,
+> and it is the only one the numbers support. Everything below is organized around it.
+
+This matters for how you read the rest of the document. `packages/core` is not here to
+make tools cheap. It is here to make a class of mistakes structurally unavailable.
 
 ## 2. Shape
 
@@ -108,3 +119,11 @@ Devin's output quality is bounded by what the repo can prove about it. CI is see
 
 These tests encode the invariants a regulator cares about. They are the guardrail
 that makes agent-authored changes to a regulated system reviewable at all.
+
+**What the harness does not do is make review fast.** Review scales with code volume and
+criticality, not with how quickly the code appeared. On agent-authored code it is
+somewhat *more* expensive per line than reviewing a colleague's: there is no author to
+ask "why this way," and the characteristic failure is plausible-but-wrong, which survives
+skimming. What CI buys is a *bounded* review — a fixed checklist, with the mechanical
+invariants already proven — not a short one. Review is the binding constraint on this
+platform's economics and no amount of agent speed relieves it.

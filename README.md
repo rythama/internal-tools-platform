@@ -32,10 +32,14 @@ on Power Apps today.
 
 ## Why this shape
 
-The interesting cost is not tool #1, it is **tool #11**. So the architecture is
-organized entirely around driving the marginal cost of a new tool toward a spec
-file, while making it structurally difficult for that 11th tool to get audit or
-access control wrong.
+The architecture is organized around one claim: **it should be structurally difficult
+for the eleventh tool to get audit or access control wrong.**
+
+It is deliberately *not* organized around making the eleventh tool cheap. We costed
+that and it does not hold — marginal per-tool cost comes out at roughly parity with
+building the same tool properly in Power Apps, because most of the per-tool work
+(requirements, security review, UAT, cutover) is not code. See
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) §1 for the correction and what replaced it.
 
 The escape hatch matters as much as the spec: any tool that outgrows the
 declarative model drops into custom React against the same primitives. That is
