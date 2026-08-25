@@ -18,6 +18,7 @@ as much a deliverable as the code.
 [Devin workflow + session log](docs/DEVIN-WORKFLOW.md) (the measurements) ·
 [Economics](docs/ECONOMICS.md) (the corrected model) ·
 [Pilot](docs/PILOT.md) (what to do next, with stopping rules) ·
+[Sources](docs/SOURCES.md) (provenance for every number) ·
 [PR #1 review](docs/PR1-REVIEW.md) (what an unreviewed merge actually contained)
 
 ### The finding

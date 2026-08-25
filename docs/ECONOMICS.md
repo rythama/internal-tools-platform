@@ -2,7 +2,8 @@
 
 *Condensed from a fuller model built during this exercise. [V] = verified against a primary
 source (Microsoft's Aug 2026 licensing guide, vendor pricing pages). [A] = assumption with a
-stated range. Figures rounded to the precision the inputs support.*
+stated range. Figures rounded to the precision the inputs support. Full provenance, including
+URLs for every [V] claim: [SOURCES.md](SOURCES.md).*
 
 ## Resolving the $250K
 
