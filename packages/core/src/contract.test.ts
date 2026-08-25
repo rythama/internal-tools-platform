@@ -5,7 +5,7 @@
  * here rather than degrading a page to stub data in production.
  */
 import { describe, expect, it } from 'vitest';
-import * as core from './index.js';
+import * as core from './index';
 
 const CONTRACT: Record<string, number> = {
   can: 3,

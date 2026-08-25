@@ -4,11 +4,11 @@
  * This module and this module only reasons about roles; the lint config enforces
  * that everywhere else. `can()` is pure and total: no I/O, no throwing, no clock.
  */
-import type { Actor, Decision, Resource, Role } from '../types.js';
-import { ALLOW_RULES, type Rule } from './rules.js';
+import type { Actor, Decision, Resource, Role } from '../types';
+import { ALLOW_RULES, type Rule } from './rules';
 
-export { ACTIONS, ALLOW_RULES, REFUND_SELF_SERVICE_LIMIT_CENTS, ROLES } from './rules.js';
-export type { Action, Rule } from './rules.js';
+export { ACTIONS, ALLOW_RULES, REFUND_SELF_SERVICE_LIMIT_CENTS, ROLES } from './rules';
+export type { Action, Rule } from './rules';
 
 function holdsAny(actorRoles: readonly Role[], ruleRoles: readonly Rule['roles'][number][]): boolean {
   return ruleRoles.some((role) => actorRoles.includes(role));

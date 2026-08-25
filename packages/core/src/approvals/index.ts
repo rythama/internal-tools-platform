@@ -6,12 +6,12 @@
  * transition — request, vote, denial, apply — is on the audit chain.
  */
 import { and, asc, eq } from 'drizzle-orm';
-import { now } from '../clock.js';
-import { db } from '../db/client.js';
-import { approvalVotes, approvals } from '../db/schema.js';
-import { appendAudit, auditDenial, type Tx } from '../audit/index.js';
-import { can } from '../policy/index.js';
-import type { Actor, ApprovalRecord, Resource } from '../types.js';
+import { now } from '../clock';
+import { db } from '../db/client';
+import { approvalVotes, approvals } from '../db/schema';
+import { appendAudit, auditDenial, type Tx } from '../audit/index';
+import { can } from '../policy/index';
+import type { Actor, ApprovalRecord, Resource } from '../types';
 
 export const SELF_APPROVAL_REASON =
   'requester may not approve their own request (four-eyes)';

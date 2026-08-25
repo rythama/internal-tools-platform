@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useFixedClock, useSystemClock } from '../clock.js';
-import { raw, useInMemoryDatabaseForTests } from '../db/client.js';
-import { PolicyDeniedError, type Actor } from '../types.js';
-import { REDACTED, maskRow, maskValues, partialMask } from './index.js';
+import { useFixedClock, useSystemClock } from '../clock';
+import { raw, useInMemoryDatabaseForTests } from '../db/client';
+import { PolicyDeniedError, type Actor } from '../types';
+import { REDACTED, maskRow, maskValues, partialMask } from './index';
 
 const KYC_ROW = {
   id: 'KYC-1',

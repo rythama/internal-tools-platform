@@ -6,8 +6,8 @@
  * independent statement of intent, and the rules are checked against it.
  */
 import { describe, expect, it } from 'vitest';
-import { ACTIONS, REFUND_SELF_SERVICE_LIMIT_CENTS, ROLES, can } from './index.js';
-import type { Actor, Role } from '../types.js';
+import { ACTIONS, REFUND_SELF_SERVICE_LIMIT_CENTS, ROLES, can } from './index';
+import type { Actor, Role } from '../types';
 
 /** action → the complete set of roles that may perform it on a bare resource. */
 const EXPECTED: Record<(typeof ACTIONS)[number], readonly Role[]> = {

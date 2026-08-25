@@ -5,12 +5,12 @@
  * has no `unmask` parameter, and the only way to see a classified value is to ask
  * for it explicitly here, hold a grant, and be recorded doing so.
  */
-import { now } from '../clock.js';
-import { db } from '../db/client.js';
-import { piiColumns } from '../db/schema.js';
-import { appendAudit, auditDenial } from '../audit/index.js';
-import { can, hasUnmaskGrant } from '../policy/index.js';
-import type { Actor } from '../types.js';
+import { now } from '../clock';
+import { db } from '../db/client';
+import { piiColumns } from '../db/schema';
+import { appendAudit, auditDenial } from '../audit/index';
+import { can, hasUnmaskGrant } from '../policy/index';
+import type { Actor } from '../types';
 
 export const REDACTED = '[redacted]';
 

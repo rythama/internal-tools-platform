@@ -6,7 +6,7 @@
  * exhaustively tested. `policy.test.ts` iterates ACTIONS × ROLES against an expected
  * table, so an action added here without a test is a failing build.
  */
-import type { Resource, Role } from '../types.js';
+import type { Resource, Role } from '../types';
 
 /**
  * Every action this deployment knows about. Adding an action here without adding it

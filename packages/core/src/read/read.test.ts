@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useFixedClock, useSystemClock } from '../clock.js';
-import { db, useInMemoryDatabaseForTests } from '../db/client.js';
-import { kycCases, refunds } from '../db/schema.js';
-import { withAudit } from '../audit/index.js';
-import { requestApproval } from '../approvals/index.js';
-import { REDACTED } from '../pii/index.js';
-import type { Actor } from '../types.js';
-import { getRow, listApprovals, listAuditRows, listRows } from './index.js';
+import { useFixedClock, useSystemClock } from '../clock';
+import { db, useInMemoryDatabaseForTests } from '../db/client';
+import { kycCases, refunds } from '../db/schema';
+import { withAudit } from '../audit/index';
+import { requestApproval } from '../approvals/index';
+import { REDACTED } from '../pii/index';
+import type { Actor } from '../types';
+import { getRow, listApprovals, listAuditRows, listRows } from './index';
 
 const REVIEWER: Actor = { sub: 'u-1', email: 'r@example.com', roles: ['kyc_reviewer'] };
 const AUDITOR: Actor = { sub: 'u-2', email: 'a@example.com', roles: ['auditor'] };

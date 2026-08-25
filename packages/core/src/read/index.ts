@@ -13,9 +13,9 @@
  */
 import { getTableColumns } from 'drizzle-orm';
 import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
-import { auditRowsNewestFirst } from '../audit/index.js';
-import { approvalsFor, toApprovalRecord } from '../approvals/index.js';
-import { db } from '../db/client.js';
+import { auditRowsNewestFirst } from '../audit/index';
+import { approvalsFor, toApprovalRecord } from '../approvals/index';
+import { db } from '../db/client';
 import {
   approvalVotes,
   approvals,
@@ -23,10 +23,10 @@ import {
   featureFlags,
   kycCases,
   refunds,
-} from '../db/schema.js';
-import { maskValues } from '../pii/index.js';
-import { can } from '../policy/index.js';
-import type { Actor, ApprovalRecord, AuditRecord } from '../types.js';
+} from '../db/schema';
+import { maskValues } from '../pii/index';
+import { can } from '../policy/index';
+import type { Actor, ApprovalRecord, AuditRecord } from '../types';
 
 /**
  * Table name → drizzle table. A spec names its table as a string, and this is the

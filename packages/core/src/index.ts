@@ -6,9 +6,9 @@
  * ./approvals and ./read. The declared shape is unchanged: every name below has the
  * signature the contract declared, so the console binds to it with no edit.
  */
-import { maskRow as maskRowImpl } from './pii/index.js';
-import type { piiColumns } from './db/schema.js';
-import type { Actor } from './types.js';
+import { maskRow as maskRowImpl } from './pii/index';
+import type { piiColumns } from './db/schema';
+import type { Actor } from './types';
 
 export type {
   Actor,
@@ -18,20 +18,20 @@ export type {
   Resource,
   Role,
   ToolSpec,
-} from './types.js';
+} from './types';
 
 /**
  * Thrown by any function in this package when `can()` denies. The denial is audited
  * (decision: 'deny') BEFORE this is thrown, so the audit trail records attempts, not
  * just successes.
  */
-export { PolicyDeniedError } from './types.js';
+export { PolicyDeniedError } from './types';
 
 /**
  * The single authorization choke point. Pure and total: no I/O, never throws.
  * Deny-by-default — an action with no matching rule returns { allowed: false }.
  */
-export { can } from './policy/index.js';
+export { can } from './policy/index';
 
 /**
  * Executes `mutate` and writes its audit record in ONE transaction. If the audit
@@ -40,16 +40,16 @@ export { can } from './policy/index.js';
  *
  * Denied attempts are also audited, with decision: 'deny'.
  */
-export { withAudit, verifyAuditChain } from './audit/index.js';
+export { withAudit, verifyAuditChain } from './audit/index';
 
 /** Maker-checker. Returns the approval record; applies the action once satisfied. */
-export { requestApproval, castVote } from './approvals/index.js';
+export { requestApproval, castVote } from './approvals/index';
 
 /**
  * Reads. Every one of them masks before returning and none takes an `unmask`
  * parameter — see ./read for why that is the load-bearing property.
  */
-export { listRows, getRow, listAuditRows, listApprovals } from './read/index.js';
+export { listRows, getRow, listAuditRows, listApprovals } from './read/index';
 
 /**
  * Masks columns classified in schema.ts `piiColumns` unless the actor holds a

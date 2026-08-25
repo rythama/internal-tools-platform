@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useFixedClock, useSystemClock } from '../clock.js';
-import { raw, useInMemoryDatabaseForTests } from '../db/client.js';
-import { verifyAuditChain } from '../audit/index.js';
-import { PolicyDeniedError, type Actor } from '../types.js';
-import { SELF_APPROVAL_REASON, castVote, findApproval, requestApproval } from './index.js';
+import { useFixedClock, useSystemClock } from '../clock';
+import { raw, useInMemoryDatabaseForTests } from '../db/client';
+import { verifyAuditChain } from '../audit/index';
+import { PolicyDeniedError, type Actor } from '../types';
+import { SELF_APPROVAL_REASON, castVote, findApproval, requestApproval } from './index';
 
 const MAKER: Actor = { sub: 'u-maker', email: 'maker@example.com', roles: ['kyc_reviewer'] };
 const CHECKER_A: Actor = { sub: 'u-a', email: 'a@example.com', roles: ['kyc_approver'] };

@@ -16,5 +16,10 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test
+      # Added after a merged PR broke `next build` while typecheck, lint and tests
+      # all stayed green: core imported './x.js' from './x.ts', which TypeScript's
+      # bundler resolution accepts and webpack does not. A harness only catches
+      # what it actually runs.
+      - run: npm run build
       # Walks the hash chain of the seeded audit log and fails on the first break.
       - run: npm run db:seed && npm run audit:verify

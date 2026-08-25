@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useFixedClock, useSystemClock } from '../clock.js';
-import { dropAuditGuardsForTests, raw, useInMemoryDatabaseForTests } from '../db/client.js';
-import { kycCases } from '../db/schema.js';
-import { db } from '../db/client.js';
-import { PolicyDeniedError, type Actor } from '../types.js';
-import { verifyAuditChain, withAudit } from './index.js';
-import { GENESIS_HASH, canonicalJSON } from './hash.js';
+import { useFixedClock, useSystemClock } from '../clock';
+import { dropAuditGuardsForTests, raw, useInMemoryDatabaseForTests } from '../db/client';
+import { kycCases } from '../db/schema';
+import { db } from '../db/client';
+import { PolicyDeniedError, type Actor } from '../types';
+import { verifyAuditChain, withAudit } from './index';
+import { GENESIS_HASH, canonicalJSON } from './hash';
 
 const REVIEWER: Actor = { sub: 'u-1', email: 'r@example.com', roles: ['kyc_reviewer'] };
 const AUDITOR: Actor = { sub: 'u-2', email: 'a@example.com', roles: ['auditor'] };

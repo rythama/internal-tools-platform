@@ -8,12 +8,12 @@
  * in `audit.test.ts` by installing a trigger that rejects audit inserts.
  */
 import { desc } from 'drizzle-orm';
-import { now } from '../clock.js';
-import { db, type Db } from '../db/client.js';
-import { auditLog, piiColumns } from '../db/schema.js';
-import { can, rolesSnapshot } from '../policy/index.js';
-import { PolicyDeniedError, type Actor, type Resource } from '../types.js';
-import { GENESIS_HASH, chainHash, hashPiiValue } from './hash.js';
+import { now } from '../clock';
+import { db, type Db } from '../db/client';
+import { auditLog, piiColumns } from '../db/schema';
+import { can, rolesSnapshot } from '../policy/index';
+import { PolicyDeniedError, type Actor, type Resource } from '../types';
+import { GENESIS_HASH, chainHash, hashPiiValue } from './hash';
 
 /** The drizzle transaction handle, as handed to `mutate`. */
 export type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];

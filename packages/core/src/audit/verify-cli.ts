@@ -3,8 +3,8 @@
  * break, so tampering fails the build rather than being noticed by someone reading
  * the log later.
  */
-import { databasePath } from '../db/client.js';
-import { verifyAuditChain } from './index.js';
+import { databasePath } from '../db/client';
+import { verifyAuditChain } from './index';
 
 const result = verifyAuditChain();
 
