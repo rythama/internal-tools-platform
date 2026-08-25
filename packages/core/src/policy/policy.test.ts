@@ -16,7 +16,10 @@ const EXPECTED: Record<(typeof ACTIONS)[number], readonly Role[]> = {
   'record.review': ['admin', 'kyc_reviewer', 'refund_agent', 'flag_admin'],
   'record.approve': ['admin', 'kyc_approver', 'refund_approver'],
   'record.purge': ['admin'],
-  'approval.vote': ['admin', 'kyc_approver', 'refund_approver'],
+  // flag_admin votes too: flags have no dedicated checker role, so the second
+  // signature on a prod change comes from another flag_admin (four-eyes still
+  // holds — the state machine refuses the requester's own vote).
+  'approval.vote': ['admin', 'kyc_approver', 'refund_approver', 'flag_admin'],
   'audit.view': ['admin', 'auditor'],
   'pii.unmask': ['admin', 'kyc_reviewer', 'kyc_approver'],
   'kyc.review': ['admin', 'kyc_reviewer'],

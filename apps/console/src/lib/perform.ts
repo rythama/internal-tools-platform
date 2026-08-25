@@ -13,6 +13,7 @@ import {
   castVote,
   getApproval,
   getRow,
+  policyAttrs,
   recordDenial,
   requestApproval,
   revealRow,
@@ -37,9 +38,13 @@ export function performAction(args: {
   const declared = spec.actions.find((candidate) => candidate.key === args.actionKey);
   if (!declared) return { status: 'denied', message: 'unknown action' };
 
-  const resource = { type: spec.queue.table, id };
   const row = getRow(spec.queue.table, id, actor);
   if (!row) return { status: 'denied', message: 'unknown record' };
+
+  // Attribute-conditional rules (e.g. the refund self-service limit) threshold on
+  // row attributes; a resource without them makes those rules fail closed and deny
+  // rows they were written to allow.
+  const resource = { type: spec.queue.table, id, attrs: policyAttrs(row) };
 
   const effects = effectsFor(spec.key);
 

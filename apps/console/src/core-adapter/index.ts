@@ -29,6 +29,8 @@ export const {
   getApproval,
   updateRow,
   recordDenial,
+  policyAttrs,
+  now,
 } = core;
 
 /**

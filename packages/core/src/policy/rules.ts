@@ -137,6 +137,17 @@ export const ALLOW_RULES: readonly Rule[] = [
   },
   {
     /**
+     * Flags have no dedicated checker role: the second signature on a prod change
+     * comes from another flag_admin. Four-eyes still holds — the approvals state
+     * machine refuses the requester's own vote regardless of role.
+     */
+    id: 'flag-checker',
+    roles: ['flag_admin'],
+    actions: ['approval.vote'],
+    reason: 'flag_admin may sign off on another admin’s flag change',
+  },
+  {
+    /**
      * can() only says the role may ever unmask. The second gate is a time-boxed
      * grant on the Actor, checked in pii/ — and the unmask itself is audited (§3.5).
      */

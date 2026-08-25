@@ -9,6 +9,8 @@
  */
 import type { Actor, Row } from '../core-adapter/index';
 import { KYC_SPEC_KEY, kycPatchFor, kycRequiresApproval, type PatchResult } from './kyc-review';
+import { REFUNDS_SPEC_KEY, refundPatchFor, refundRequiresApproval } from './refunds';
+import { FLAGS_SPEC_KEY, flagPatchFor, flagRequiresApproval } from './feature-flags';
 
 export type ToolEffects = {
   /** Extra approval trigger, OR-ed with the spec's threshold. Can only add a hop. */
@@ -28,6 +30,16 @@ const EFFECTS: Readonly<Record<string, ToolEffects>> = {
     requiresApproval: kycRequiresApproval,
     patchFor: kycPatchFor,
     applyPermission: 'kyc.approve',
+  },
+  [REFUNDS_SPEC_KEY]: {
+    requiresApproval: refundRequiresApproval,
+    patchFor: refundPatchFor,
+    applyPermission: 'refund.approve',
+  },
+  [FLAGS_SPEC_KEY]: {
+    requiresApproval: flagRequiresApproval,
+    patchFor: flagPatchFor,
+    applyPermission: 'flag.toggle',
   },
 };
 
