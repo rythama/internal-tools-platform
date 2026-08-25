@@ -97,9 +97,15 @@ review across three PRs, one of which got zero.**
 Review time rose with criticality — 0 → 5–10 → 10–15 minutes — which is the right direction
 and still an order of magnitude below what the volume warrants.
 
-¹ ACU consumption for session 2 was lost when the account changed mid-run. Recorded as
-unavailable rather than estimated. The rate card itself was never obtained in writing, so any
-dollar figure derived from it would be fabricated precision.
+¹ Session 2 ran on an account that was migrated away mid-exercise; its cost is lost and
+recorded as unavailable rather than estimated.
+
+**Measured agent cost (billing page, not estimated): $20.04 on-demand** for the three
+sessions run on the current account — core primitives (7m), KYC tool (20m31s), refunds +
+flags (9m30s). Roughly **$6.70 per session**, ~4,300 lines, 227 tests. This is the number
+the economic model marked [U] all the way through: the model assumed ACU spend was ~4% of
+build cost and economically irrelevant, and the measurement lands well below even that.
+The cost of the agent was never the story; the cost of verifying it was.
 
 ### What session 2 actually shows
 
