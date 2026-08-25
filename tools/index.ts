@@ -10,5 +10,7 @@
  */
 import type { ToolSpec } from '@itp/core';
 import { spec as kycReview } from './kyc-review/spec.js';
+import { spec as refunds } from './refunds/spec.js';
+import { spec as featureFlags } from './feature-flags/spec.js';
 
-export const specs: readonly ToolSpec[] = [kycReview];
+export const specs: readonly ToolSpec[] = [kycReview, refunds, featureFlags];

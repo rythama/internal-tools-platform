@@ -34,6 +34,13 @@ export { PolicyDeniedError } from './types';
 export { can } from './policy/index';
 
 /**
+ * The self-service refund limit, exported so a tool spec can declare its
+ * `approvalThreshold` against the same number the `refund-maker-under-limit` rule
+ * enforces — one constant, two enforcement layers, no drift.
+ */
+export { REFUND_SELF_SERVICE_LIMIT_CENTS } from './policy/rules';
+
+/**
  * Executes `mutate` and writes its audit record in ONE transaction. If the audit
  * write fails the mutation rolls back. There is deliberately no way to mutate a
  * domain table through this package without producing an audit row.
@@ -87,6 +94,20 @@ export {
  */
 export { updateRow } from './write/index';
 export type { RowDiff } from './write/index';
+
+/**
+ * The row attributes `can()` is allowed to threshold on. The console passes these
+ * when resolving actions so attribute-conditional rules (e.g. the refund limit) see
+ * the same attributes at offer time that `updateRow` gives them at write time.
+ */
+export { policyAttrs } from './read/index';
+
+/**
+ * The package clock. Domain patches that carry timestamps (e.g. a flag's
+ * `updatedAt`) must read the same clock the audit chain does, or a pinned test
+ * clock would produce nondeterministic rows next to deterministic audit entries.
+ */
+export { now } from './clock';
 
 /**
  * Masks columns classified in schema.ts `piiColumns` unless the actor holds a

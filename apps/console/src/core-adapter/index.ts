@@ -29,6 +29,8 @@ export const {
   getApproval,
   updateRow,
   recordDenial,
+  policyAttrs,
+  now,
   isKnownTable,
   mintAssertion,
   verifyAssertion,
