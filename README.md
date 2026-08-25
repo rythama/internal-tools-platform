@@ -16,6 +16,8 @@ as much a deliverable as the code.
 **Start here:** [Key Decisions](docs/KEY-DECISIONS.md) (one page, the reasoning) ·
 [Architecture](docs/ARCHITECTURE.md) (normative design) ·
 [Devin workflow + session log](docs/DEVIN-WORKFLOW.md) (the measurements) ·
+[Economics](docs/ECONOMICS.md) (the corrected model) ·
+[Pilot](docs/PILOT.md) (what to do next, with stopping rules) ·
 [PR #1 review](docs/PR1-REVIEW.md) (what an unreviewed merge actually contained)
 
 ### The finding

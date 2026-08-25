@@ -108,6 +108,17 @@ and still an order of magnitude below what the volume warrants. The mutation har
 is the structural answer: the five invariants the original suite could not defend are now a
 CI gate that fails if any mutant survives.
 
+### What Devin did not build
+
+The functional system — primitives, console, tools, harness — is Devin's, per the log above.
+The **presentation layer as submitted is not**: the visual design (light fintech theme,
+typography, formatting of money and dates, layout) was iterated afterward by a human directing
+an AI assistant against browser screenshots, over several passes. Logged for the same reason
+everything else here is: agent sessions produced a working system whose UI read as an engineer
+demo, and making it customer-presentable took design judgment applied iteratively against the
+rendered result — a real cost that per-tool estimates should carry and agent speed does not
+remove.
+
 Postscript, recorded because it is the thesis in miniature: the first attempt to write this
 very table was clobbered by a scripting bug that printed "log updated" and wrote a stale
 buffer — caught only because the final read-through checked the file instead of the message.

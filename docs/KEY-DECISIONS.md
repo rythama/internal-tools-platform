@@ -44,6 +44,14 @@ So the recommendation isn't a saving. It's a **capability purchase at ~$400K/yr*
 alone buys ~65% of the four primitives at ~$125–145K/yr; owning the primitives buys the last ~30%
 for ~$260–275K/yr. Sold as "saves money," it dies in the room.
 
+## Time, honestly accounted
+
+The prototype itself fits the ~2-hour bound: ~30 minutes of human seeding (architecture,
+schema, contract, CI) plus ~66 minutes of agent time. The commit history spans longer because
+analysis, corrections, and presentation polish continued afterward — including a UI design
+pass that was human/assistant work, not Devin's (logged in DEVIN-WORKFLOW.md). I'd rather
+state that than have it reconstructed from timestamps.
+
 ## What the prototype actually measured
 
 Three sessions: ~37 minutes of agent time, ~5,600 lines, 211 tests, ~20–25 minutes of human review.
