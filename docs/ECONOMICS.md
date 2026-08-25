@@ -47,6 +47,13 @@ Not a cost saving — a **capability purchase**, priced honestly:
 - **The last ~30% of compliance capability therefore costs ~$260–275K/yr.** That is a
   legitimate budget question, and a fatal thing to mis-sell as savings.
 
+*How the equivalent-annual figures are computed [A]: each option's 10-year cash flows versus
+the optimized baseline (build capex, migration, infrastructure ~$90K/yr, ownership FTEs at
+fully loaded cost, pen tests, minus recovered license spend) are discounted at 15% and the
+resulting NPV is annualized over the horizon (annuity factor ~5.0; e.g. −$2.0M NPV →
+~$400K/yr). The dominant input is ownership headcount, not software: ±0.5 FTE moves the
+figure ~$130K/yr.*
+
 ## What the prototype measured (vs. what the model assumed)
 
 Agent cost is noise: **~$27 measured** for ~66 min of agent time across six sessions
