@@ -4,99 +4,71 @@
 
 ## The reframe that set the scope
 
-"Can Devin build these tools?" is not the question — Next.js CRUD over Postgres is not hard.
-The question is whether owning ~13 internal tools costs less than $250K/year once you count
-the platform underneath them, the person who owns it, and the compliance surface it drags
-into scope.
+"Can Devin build these tools?" isn't the question — CRUD over Postgres isn't hard. The question
+is whether owning ~13 internal tools costs less than $250K/year once you count the platform
+underneath, the person who owns it, and the compliance surface it drags into scope.
 
-So I scoped the prototype around the **eleventh** tool, not the first: one console hosting many
-tools, each a spec file over shared primitives — deny-by-default authorization, hash-chained
-audit, PII masking with audited break-glass, maker-checker approvals. I anchored on the KYC
-review queue because it forces all four to be load-bearing at once.
+So I scoped around the **eleventh** tool, not the first: one console hosting many tools, each a
+spec over shared primitives — deny-by-default authorization, hash-chained audit, PII masking with
+audited break-glass, maker-checker approvals. Anchored on the KYC queue because it forces all four
+to be load-bearing at once.
 
-I deliberately did **not** try to replicate two things Power Apps is genuinely good at: the
-citizen-development motion, and the connector catalogue. Devin makes engineer-hours cheap; it
-does not turn an ops analyst into an app author. Claiming otherwise is the fastest way to lose
-a technical VP.
+I deliberately did **not** replicate the two things Power Apps is genuinely good at: citizen
+development and the connector catalogue. Devin makes engineer-hours cheap; it doesn't turn an ops
+analyst into an app author.
 
 ## Three architectural decisions
 
-**1. Guardrails before agents.** I hand-wrote the architecture doc, schema, core contract and CI
-*before* opening a session. Not for tidiness — because an agent's output quality is bounded by
-what the repo can prove about it. The one control I made machine-checkable (a lint rule banning
-inline role checks outside the policy module) is the one Devin respected without being asked.
+**Guardrails before agents.** Architecture doc, schema, core contract and CI hand-written *before*
+the first session — because an agent's output is bounded by what the repo can prove about it.
 
-**2. Interface-first, so sessions could run concurrently.** I declared the core contract up front
-so two sessions could build against it simultaneously without touching each other's files. This
-worked: core landed and the console bound to it with **zero edits to the console**. That is the
-whole throughput argument, and it is now demonstrated rather than asserted.
+**Interface-first, so sessions could run concurrently.** I declared the core contract up front so
+two sessions could build against it simultaneously. It worked: core landed and the console bound
+to it with **zero console edits**. That's the throughput argument, demonstrated rather than asserted.
 
-**3. Masking as a structural property, not a call-site choice.** The read API applies masking
-internally and takes no `unmask` parameter. An API that lets the caller opt out of masking is an
-API through which PII leaks.
+**Masking as a structural property.** The read API masks internally and takes no `unmask`
+parameter. An API that lets the caller opt out of masking is an API through which PII leaks.
 
-## Where the reasoning moved — twice
+## The thesis moved twice
 
-I opened believing "build, but build a framework." Research killed it. Marginal per-tool cost
-comes out at **parity** with Power Apps (~$40K vs ~$39K) — only ~12% of per-tool work is
-agent-compressible; the rest is requirements, security review, UAT, cutover. The premise my
-architecture was organized around was wrong, and the repo now says so in `ARCHITECTURE.md §1`.
+I opened with "build a framework." Marginal per-tool cost came out at **parity** with Power Apps
+(~$40K vs ~$39K) — only ~12% of per-tool work is agent-compressible. The premise my architecture
+was organized around was wrong; the repo now says so in `ARCHITECTURE.md §1`.
 
-I then adopted "split the stack — own the primitives, rent the UI." A red-team pass found six
-tier-1 errors in my own model, including an unjustified 3.2× maintenance penalty against the
-incumbent and a recommendation whose own corrective action was never applied to its baseline.
-Corrected, **split-the-stack does not break even at any tool count, discount rate, or horizon**
-(P(NPV>0) = 0.0% over 20,000 draws).
+I moved to "own the primitives, rent the UI." A red-team pass then found six tier-1 errors in my
+own model — including an unjustified 3.2× maintenance penalty against the incumbent, and a
+recommendation whose own corrective action was never applied to its baseline. Corrected, **split-
+the-stack never breaks even** at any tool count, discount rate, or horizon.
 
-So the recommendation is not a cost saving. It is a **capability purchase at ~$400K/yr**, and the
-honest question for the CFO is: renting the UI alone buys ~65% of the four primitives at
-~$125–145K/yr; owning the primitives underneath buys the last ~30% for ~$260–275K/yr. Is that
-worth it? Sold as "saves money," it dies in the room.
+So the recommendation isn't a saving. It's a **capability purchase at ~$400K/yr**: renting the UI
+alone buys ~65% of the four primitives at ~$125–145K/yr; owning the primitives buys the last ~30%
+for ~$260–275K/yr. Sold as "saves money," it dies in the room.
 
 ## What the prototype actually measured
 
-Two sessions, ~9 and ~7 minutes, 5,151 lines, 270 tests. The useful findings both contradict me.
+Three sessions: ~37 minutes of agent time, ~5,600 lines, 211 tests, ~20–25 minutes of human review.
+Two findings, both against me.
 
-**1. The verification harness proved none of the invariants it advertised.** I built the
-guardrails first specifically so agent output would be safe to merge. Mutation testing says
-otherwise: delete PII masking from the read path — 54/54 green. Defeat the two-person rule —
-green. Delete the four-eyes gate — typecheck, lint and tests all pass. The lint rule I called
-"machine-checked" is evaded five ways, including `roles.some(r => r === 'admin')`, the idiom the
-repo's own policy module uses.
+**The verification harness proved none of the invariants it advertised.** Mutation testing: delete
+PII masking — 54/54 green. Defeat the two-person rule — green. Remove the four-eyes gate — green.
+The lint rule I called "machine-checked" is evaded five ways, including the idiom the repo's own
+policy module uses. I built more apparatus than most teams do, deliberately, and it caught none of it.
 
-The confirmed critical is that two-person control counts *votes*, not *voters* — one approver
-clicking twice satisfies a 2-of-2. That is the single control the architecture exists to
-implement once "rather than re-derived per tool, which is where it eventually gets derived
-wrong," and the one shared implementation derived it wrong.
+**Review doesn't scale with lines; it scales with load-bearing claims — and reading doesn't find
+them.** Every confirmed defect was correct-looking code wrong in one conjunct
+(`.length >= requiredApprovals`, `typeof value === 'number' &&`). Finding them took *executing
+mutations*. PR #1 merged unread 17 seconds after opening; the tax wasn't paid, it was skipped,
+invisibly, because CI stayed green.
 
-**2. Review does not scale with lines; it scales with load-bearing claims — and reading does not
-find them.** Every confirmed defect has the same shape: correct-looking code wrong in one
-conjunct (`.length >= requiredApprovals`, `typeof value === 'number' &&`, `?? actorForRole(...)`).
-None is visible at reading speed. Finding them took *executing mutations*, which costs far more
-than the 1.3× review inflation my model assumed.
-
-PR #1 merged **unread, 17 seconds after opening**; PR #2 got **5–10 minutes** for 2,228 lines,
-roughly 1–2% of a careful review. The tax was not paid — it was skipped, invisibly, because CI
-stayed green.
-
-Worth stating: the agent-run review was itself wrong about half the time — adversarial
-verification confirmed 5 findings and downgraded 9, including three of four "criticals," while
-the genuine critical ranked fifth. **If your review pipeline is agent-run, budget for the
-adversarial pass.**
-
-The sharpest way I can put it: *the artifact CI produces — "54 passed" — stops carrying
-information at that authorship rate, and nobody notices, because it looks identical to the
-artifact it produced when it did.*
+The fix worked: session 3's tests assert audit rows and state transitions rather than functions,
+and now kill 5/5 mutants. But that only happened because we measured.
 
 ## What I'd flag
 
-I over-ranked a finding earlier and want it on the record: I called the hardcoded session secret a
-critical auth bypass. It is major, not critical — `/api/session` hands out any role for free by
-design, so knowing the secret confers no incremental privilege. It stays major only because a
-comment there asserts a fail-closed guarantee that does not exist, which is the exact hazard of
-fluent agent prose: a confident comment gets read as evidence.
+I over-ranked the hardcoded session secret as critical. It's major — `/api/session` hands out any
+role by design, so the secret confers no incremental privilege. The genuine critical was a
+two-person rule counting votes rather than voters.
 
-The prototype demonstrates the primitives, not the recommendation. The recommendation's technical
-crux — binding a *rented* UI's queries to the end user's identity so it cannot forge or escalate —
-is untested here and is the Week-2 gate of the proposed pilot. That, plus mutation testing in CI,
-is where I would spend the next two hours. Not on more tools.
+The prototype demonstrates the primitives, not the recommendation. Its crux — binding a *rented*
+UI's queries to an identity it can't forge — is untested here and is the pilot's Week-2 gate.
+That, plus mutation testing in CI, is where the next two hours go. Not more tools.
