@@ -29,6 +29,10 @@ export const {
   getApproval,
   updateRow,
   recordDenial,
+  isKnownTable,
+  mintAssertion,
+  verifyAssertion,
+  SERVICE_ACTOR,
 } = core;
 
 /**
