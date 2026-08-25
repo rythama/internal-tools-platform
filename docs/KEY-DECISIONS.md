@@ -66,8 +66,9 @@ the repo's own policy module uses.
 
 **Review does not scale with lines. It scales with load-bearing claims, and reading does not
 find them.** Every confirmed defect was correct-looking code wrong in one conjunct. Finding
-them required executing mutations, not reading diffs. PR #1 merged unread, 17 seconds after
-opening, because CI was green. The review tax was not paid. It was skipped, invisibly.
+them required executing mutations, not reading diffs. Across six PRs, human review ranged from
+minutes to essentially none against volume warranting hours, and CI stayed green throughout.
+The review tax was not paid. It was skipped, invisibly.
 
 The fix worked: tests that assert audit rows and state transitions now kill 5/5 mutants in CI.
 That only happened because we measured.
