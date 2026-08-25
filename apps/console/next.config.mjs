@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // No floating "N" dev badge in the corner — this app gets screen-recorded.
+  devIndicators: false,
   reactStrictMode: true,
   // Workspace packages ship TypeScript sources, not build output — one less build step
   // between an edit and the console reflecting it.
