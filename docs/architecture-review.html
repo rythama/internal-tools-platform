@@ -121,13 +121,13 @@
 
 <header class="top">
   <div class="col">
-    <p class="eyebrow">Architecture review · prototype</p>
+    <p class="eyebrow">Architecture review · measured prototype</p>
     <h1>Renting the console, or owning it</h1>
     <p class="standfirst">Three internal tools today, ten more planned, $250K/year in platform licence.
     The question is not whether engineers can build a review queue — they obviously can. It is
-    <strong>whether the eleventh one can get the audit trail wrong.</strong> Costing this properly
-    killed the cheaper argument: marginal per-tool cost lands at parity with Power Apps. What
-    survives is a claim about control, not about price.</p>
+    <strong>whether the eleventh one can get the audit trail wrong.</strong> We built it, then
+    measured it. Both headline claims — that building is cheaper, and that guardrails make agent
+    code safe — turned out to be false, and the second one is the more interesting failure.</p>
   </div>
 </header>
 
@@ -297,68 +297,62 @@
 
 <section>
   <div class="col">
-    <h2>How tool #11 ships</h2>
-    <p>This is where Devin earns its place, and also where the honest caveat lives. Agent speed
-    collapses the build step and leaves the review step almost untouched. Any cost model that
-    forgets this will overpromise.</p>
+    <h2>What the harness actually proved</h2>
+    <p>The plan was that a verification harness written before the first session would make
+    agent-authored changes safe to merge. So we tested that claim the only way it can be
+    tested: by deleting each control and asking whether the suite noticed.</p>
   </div>
 
   <figure>
     <div class="figscroll">
-    <svg viewBox="0 0 1000 290" role="img" aria-label="The pipeline for adding a new internal tool: a human writes the spec and policy tests, Devin implements it, CI runs typecheck lint policy matrix and audit chain verification, a human reviews against a fixed four-item checklist, then it deploys. Build time collapses to minutes while review time stays roughly constant.">
-      <defs>
-        <marker id="a3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M0,1 L7,4 L0,7 z" fill="currentColor"/>
-        </marker>
-      </defs>
+    <svg viewBox="0 0 1000 330" role="img" aria-label="Mutation testing results before and after. Before, deleting PII masking, defeating the two-person rule, removing the four-eyes gate, and reopening the approval threshold all left the test suite fully green. After rewriting tests to assert audit rows and state transitions, all five mutations were caught.">
+      <text class="dhead" x="330" y="26" text-anchor="middle">BEFORE · 54 TESTS, CI GREEN</text>
+      <text class="dhead" x="740" y="26" text-anchor="middle">AFTER · TESTS ASSERT INVARIANTS</text>
+      <line class="rule" x1="24" y1="38" x2="636" y2="38"/>
+      <line class="rule" x1="676" y1="38" x2="976" y2="38"/>
 
-      <text class="dlab" x="24"  y="48">HUMAN</text>
-      <rect class="dbox-o" x="24" y="60" width="176" height="58" rx="2"/>
-      <text class="dt" x="40" y="84">spec.ts + policy tests</text>
-      <text class="dsub" x="40" y="103">the guardrail, written first</text>
+      <text class="dsub" x="24" y="72">delete PII masking from the read path</text>
+      <text class="tdeny" x="500" y="72">survived</text>
+      <text class="taccent" x="700" y="72">caught</text>
 
-      <g color="var(--muted)"><line class="dline" x1="200" y1="89" x2="238" y2="89" marker-end="url(#a3)"/></g>
+      <text class="dsub" x="24" y="108">defeat the two-person rule</text>
+      <text class="tdeny" x="500" y="108">survived</text>
+      <text class="taccent" x="700" y="108">caught</text>
 
-      <text class="dlab" x="238" y="48">DEVIN</text>
-      <rect class="dbox" x="238" y="60" width="176" height="58" rx="2"/>
-      <text class="dt" x="254" y="84">Implementation</text>
-      <text class="dsub" x="254" y="103">Knowledge + setup.sh</text>
+      <text class="dsub" x="24" y="144">remove the four-eyes gate and its import</text>
+      <text class="tdeny" x="500" y="144">survived</text>
+      <text class="taccent" x="700" y="144">caught</text>
 
-      <g color="var(--muted)"><line class="dline" x1="414" y1="89" x2="452" y2="89" marker-end="url(#a3)"/></g>
+      <text class="dsub" x="24" y="180">reopen the approval threshold</text>
+      <text class="tdeny" x="500" y="180">survived</text>
+      <text class="taccent" x="700" y="180">caught</text>
 
-      <text class="dlab" x="452" y="48">CI</text>
-      <rect class="dbox" x="452" y="60" width="196" height="58" rx="2"/>
-      <text class="dt" x="468" y="84">npm run verify</text>
-      <text class="dsub" x="468" y="103">policy matrix · audit chain</text>
+      <text class="dsub" x="24" y="216">remove the self-approval guard</text>
+      <text class="tdeny" x="500" y="216">survived</text>
+      <text class="taccent" x="700" y="216">caught</text>
 
-      <g color="var(--muted)"><line class="dline" x1="648" y1="89" x2="686" y2="89" marker-end="url(#a3)"/></g>
-
-      <text class="dlab" x="686" y="48">HUMAN</text>
-      <rect class="dbox-o" x="686" y="60" width="176" height="58" rx="2"/>
-      <text class="dt" x="702" y="84">Review</text>
-      <text class="dsub" x="702" y="103">same 4-item checklist</text>
-
-      <g color="var(--accent)"><line class="dline-o" x1="862" y1="89" x2="900" y2="89" marker-end="url(#a3)"/></g>
-      <text class="dt" x="906" y="94">deploy</text>
-
-      <!-- timing brackets -->
-      <path class="dline" d="M238,150 L238,162 L414,162 L414,150" />
-      <text class="taccent" x="326" y="182" text-anchor="middle">minutes, and parallel</text>
-      <text class="dsub" x="326" y="200" text-anchor="middle">this is the part that collapses</text>
-
-      <path class="dline" d="M686,150 L686,162 L862,162 L862,150" />
-      <text class="tdeny" x="774" y="182" text-anchor="middle">~10 min, per tool, always</text>
-      <text class="dsub" x="774" y="200" text-anchor="middle">this is the part that does not</text>
-
-      <line class="rule" x1="24" y1="236" x2="976" y2="236"/>
-      <text class="dsub" x="24" y="262">Sessions 1 and 2 ran concurrently because the @itp/core contract was written before either started.</text>
+      <line class="rule" x1="24" y1="248" x2="976" y2="248"/>
+      <text class="dsub" x="24" y="276">The lint rule called &#8220;machine-checked&#8221; was evaded five ways, including the idiom the policy module itself uses.</text>
+      <text class="dsub" x="24" y="300">Nothing changed in the controls between the two columns. Only the tests changed: assert the audit row, not the function.</text>
     </svg>
     </div>
-    <figcaption><strong>Interface-first design is what makes parallel agents usable.</strong> Declaring
-    the core contract up front let two sessions run at once against the same types. Without that step
-    you serialize the work, and the throughput argument for agents quietly disappears — which is why
-    the seeding work, not the generation, is the part worth teaching a team.</figcaption>
+    <figcaption><strong>A suite that cannot fail is not evidence.</strong> Every control the
+    architecture document treats as load-bearing could be deleted with the suite fully green.
+    The fix was not more tests — it was tests that assert the invariant (an audit row appears,
+    a state transition is refused) rather than that a function returns what it returns.</figcaption>
   </figure>
+
+  <div class="col">
+    <h3>And the review that was supposed to catch it</h3>
+    <p>Three pull requests, ~37 minutes of agent time, ~5,600 lines. Human review: <strong>0
+    minutes, then 5&#8211;10, then 10&#8211;15.</strong> The first merged seventeen seconds after
+    it opened, on a green check.</p>
+    <p>The model assumed review is the binding constraint and <em>inflates</em> on agent-authored
+    code. That is not what happened. Review depth fell to fit the time available rather than
+    hours rising to fit the code — <strong>the tax was not paid, it was skipped</strong> — and
+    because CI stayed green, nothing signalled it. All three real defects were found by a rival
+    agent session or an automated review pass. None by a human reading the diff.</p>
+  </div>
 </section>
 
 <section>
@@ -403,10 +397,17 @@
 </section>
 
 <div class="wrap note">
-  <p>Prototype built in roughly two hours with Devin as the implementation tool; architecture,
-  schema, core contract and CI were authored by hand first, deliberately. Economic model and
-  recommendation follow separately. SQLite stands in for Postgres so the repository runs with no
-  infrastructure — a demo tradeoff, not a production recommendation.</p>
+  <p><strong>The recommendation, in one line:</strong> this is not a cost saving. Corrected for a
+  baseline where Power Apps is first optimised in place, owning the stack never breaks even at any
+  tool count, discount rate or horizon. Renting the UI layer reaches parity at roughly
+  $125&#8211;145K/year and buys about 65% of the four primitives; owning the primitives underneath
+  costs roughly $400K/year. The last 30% of compliance capability costs $260&#8211;275K/year — a
+  legitimate purchase, and a fatal thing to mis-sell as savings.</p>
+  <p>Prototype built with Devin as the implementation tool; architecture, schema, core contract
+  and CI authored by hand first, deliberately. SQLite stands in for Postgres so the repository runs
+  with no infrastructure — a demo tradeoff, not a production recommendation. The recommendation's
+  technical crux, binding a rented UI's queries to an identity it cannot forge, is untested here
+  and is the proposed pilot's week-two gate.</p>
 </div>
 
 </div>

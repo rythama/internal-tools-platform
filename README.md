@@ -8,9 +8,25 @@ Built with [Devin](https://devin.ai) as the primary implementation tool. The
 process is documented in [docs/DEVIN-WORKFLOW.md](docs/DEVIN-WORKFLOW.md) and is
 as much a deliverable as the code.
 
-> **Status:** prototype, ~2 hours of build time. Not production software.
-> Known gaps are listed at the bottom — deliberately, since an honest gap list is
-> more useful to the decision than a polished demo.
+> **Status:** prototype. ~37 minutes of agent time across three Devin sessions,
+> ~5,600 lines, 211 tests. Not production software. Known gaps are listed at the
+> bottom — deliberately, since an honest gap list is more useful to the decision
+> than a polished demo.
+
+**Start here:** [Key Decisions](docs/KEY-DECISIONS.md) (one page, the reasoning) ·
+[Architecture](docs/ARCHITECTURE.md) (normative design) ·
+[Devin workflow + session log](docs/DEVIN-WORKFLOW.md) (the measurements) ·
+[PR #1 review](docs/PR1-REVIEW.md) (what an unreviewed merge actually contained)
+
+### The finding
+
+The plan was that a verification harness written before the first session would make
+agent-authored code safe to merge. Mutation testing says it did not: deleting PII masking,
+defeating the two-person rule, and removing the four-eyes gate each left the suite fully
+green. The lint rule this repo called "machine-checked" was evadable five ways.
+
+It is fixed now — the same five mutations are all caught — but only because we measured.
+That, not the console, is what this prototype is evidence for.
 
 ## What this is
 
