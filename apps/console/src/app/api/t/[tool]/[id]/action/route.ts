@@ -60,6 +60,9 @@ export async function POST(request: Request, context: Context): Promise<NextResp
       const approval = requestApproval({
         actor,
         action: declared.key,
+        // Contract now takes the permission explicitly: core authorizes the request
+        // itself rather than the console vouching that it already did.
+        permission: declared.permission,
         resource,
         payload: { action: declared.key },
         requiredApprovals: declared.approval?.requiredApprovals ?? 1,

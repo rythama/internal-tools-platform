@@ -20,7 +20,21 @@ do not redesign them.
    `'low'` → partial (`a***@example.com`, `**** 4242`). Unmasking emits an audit event.
 4. `approvals/` — the state machine. Self-approval rejected when
    `disallowSelfApproval`. Applying a satisfied approval is idempotent.
-5. `db/seed.ts` — deterministic seed: ~40 KYC cases with a realistic risk/SLA spread
+5. **Read API** — `listRows`, `getRow`, `listAuditRows`, `listApprovals`. These were
+   missing from the first version of the contract; the console cannot render a queue,
+   detail page, approvals panel or audit view without them, and components are
+   forbidden from touching the database.
+
+   **The load-bearing property: each applies `maskRow()` before returning, and none
+   takes an `unmask` parameter.** Masking must not be a call-site decision — an unmask
+   is a separate, individually audited action. Each is also authorization-scoped: rows
+   the actor may not see are absent from the result, not merely hidden by the UI.
+
+6. `CORE_IMPLEMENTED` — export it as `true`. The console feature-detects on this rather
+   than on the presence of `can`, so a partial implementation (mutations landed, reads
+   not yet) is visible instead of silently serving stub reads alongside real writes.
+
+7. `db/seed.ts` — deterministic seed: ~40 KYC cases with a realistic risk/SLA spread
    (some breaching), ~25 refunds spanning the approval threshold, ~12 flags. Fake
    data only — no real PII, no real card numbers.
 
@@ -33,10 +47,22 @@ do not redesign them.
   assert on the serialized payload, not just the return value.
 - Approvals: requester cannot self-approve; N-of-M satisfaction; double-apply is a no-op.
 
+## Context: the console already exists
+`apps/console` and `packages/ui` were built in a parallel session and are merged on
+`main`. The console binds to this package through a runtime feature-detect in
+`apps/console/src/core-adapter/index.ts`, falling back to a local stub. **When your
+implementation lands, the console should pick it up with no edit to the console.**
+
+Match the declared signatures exactly. When you are done, the stub files
+(`core-adapter/policy-stub.ts`, `core-adapter/stub-runtime.ts`) should be deletable —
+but do not delete them in this PR; that is a separate, reviewable change.
+
 ## Do not
 - Do not add an UPDATE or DELETE path for `audit_log`.
 - Do not read roles from anywhere but the passed `Actor`.
 - Do not introduce Postgres, Docker, or a migration tool. SQLite only, per §3.1.
+- Do not edit `apps/console/` or `packages/ui/`. If the console must change for your
+  implementation to bind, say so in the PR description instead of changing it.
 
 ## Done when
 `npm run verify` passes locally and CI is green on the PR.

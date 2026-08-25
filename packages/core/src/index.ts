@@ -65,7 +65,15 @@ export declare function maskRow<T extends Record<string, unknown>>(
 /** Maker-checker. Returns the approval record; applies the action once satisfied. */
 export declare function requestApproval(args: {
   actor: Actor;
+  /** Spec action key, e.g. 'approve'. Identifies WHAT is being requested. */
   action: string;
+  /**
+   * Permission checked via can() before the request is recorded, e.g. 'kyc.approve'.
+   * Separate from `action` because a spec action carries both, and core does not read
+   * specs. Without this, core cannot authorize a request without re-deriving the
+   * mapping it has no access to.
+   */
+  permission: string;
   resource: Resource;
   payload: Record<string, unknown>;
   requiredApprovals: number;
@@ -107,3 +115,90 @@ export interface ToolSpec {
     approvalThreshold?: { field: string; gt: number };
   }>;
 }
+
+/* --------------------------------------------------------- denial channel */
+
+/**
+ * Thrown by any function in this package when `can()` denies. The denial is audited
+ * (decision: 'deny') BEFORE this is thrown, so the audit trail records attempts, not
+ * just successes.
+ *
+ * Added because `withAudit()` returns `T` and therefore had no way to signal a denial
+ * to its caller — a gap found by the session that had to build against this contract,
+ * not by its author.
+ */
+export declare class PolicyDeniedError extends Error {
+  readonly decision: Decision & { allowed: false };
+  constructor(decision: Decision & { allowed: false });
+}
+
+/* -------------------------------------------------------------- read API */
+
+/**
+ * Reads. These exist because ARCHITECTURE.md forbids components from touching the
+ * database, and a queue, a detail page, an approvals panel and an audit view are all
+ * reads — so a contract of mutations alone is unimplementable. That omission was an
+ * error in the original contract.
+ *
+ * THE LOAD-BEARING PROPERTY: every function here applies `maskRow()` before returning.
+ * Masking is not optional at the call site and there is no `unmask` parameter on these
+ * functions — an unmask is a separate, individually audited action. A read API that
+ * lets the caller choose whether to mask is a read API through which PII leaks.
+ *
+ * Each is also authorization-scoped: rows the actor may not see are absent from the
+ * result, not merely hidden by the UI.
+ */
+export declare function listRows<T extends Record<string, unknown>>(
+  table: string,
+  actor: Actor,
+): T[];
+
+export declare function getRow<T extends Record<string, unknown>>(
+  table: string,
+  id: string,
+  actor: Actor,
+): T | undefined;
+
+export interface AuditRecord {
+  seq: number;
+  occurredAt: string;
+  actorEmail: string;
+  action: string;
+  resourceType: string;
+  resourceId: string;
+  decision: 'allow' | 'deny';
+  decisionReason?: string;
+  /** Field-level before/after. PII values appear here hashed, never in clear (§3.5). */
+  diff?: Record<string, unknown>;
+  prevHash: string;
+  hash: string;
+}
+
+/** Newest first. Requires an auditor-capable role; scoped by can() like everything else. */
+export declare function listAuditRows(actor: Actor): AuditRecord[];
+
+export interface ApprovalRecord {
+  approvalId: number;
+  action: string;
+  resourceType: string;
+  resourceId: string;
+  state: 'pending' | 'approved' | 'rejected' | 'applied' | 'expired';
+  requestedBy: string;
+  requestedAt: string;
+  requiredApprovals: number;
+  votes: Array<{ voterSub: string; vote: 'approve' | 'reject'; note?: string; votedAt: string }>;
+}
+
+export declare function listApprovals(
+  resourceType: string,
+  resourceId: string,
+  actor: Actor,
+): ApprovalRecord[];
+
+/**
+ * True when this package ships a real implementation rather than declarations.
+ * The console feature-detects on this rather than on the presence of `can`, so that
+ * a partial implementation — mutations landed, reads not yet — is visible instead of
+ * silently serving stub reads alongside real writes.
+ */
+export declare const CORE_IMPLEMENTED: boolean;
