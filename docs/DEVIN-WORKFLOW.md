@@ -85,11 +85,44 @@ way," or a fix authored by hand. Zero is a legitimate result. So is six.
 
 | # | Session | Started | PR opened | Wall-clock | ACUs | Corrections | Net LOC | Notes |
 |---|---|---|---|---|---|---|---|---|
-| 1 | core primitives | 2026-08-24 20:24 | | | | | | running |
-| 2 | console shell | 2026-08-24 20:24 | | | | | | running, concurrent with 1 |
+| 1 | core primitives | 2026-08-24 20:24 | — | — | — | — | — | **Operator-stopped** during an account migration. Not a Devin failure — no conclusion should be drawn from this row. Re-running. |
+| 2 | console shell | 2026-08-24 20:24 | 20:33:40 | **9m 40s** | unavailable¹ | **0** | +2,923 / −10 | [PR #1](https://github.com/rythama/internal-tools-platform/pull/1), merged. 54 tests, `npm run verify` green. |
 | 3 | KYC review queue | | | | | | | not started |
 | 4 | refunds + flags | | | | | | | not started |
 
-Sessions 1 and 2 were launched concurrently against the same repo. Session 2 builds
-against a contract session 1 is implementing at the same time — whether that actually
-works is a finding, not an assumption, and it gets reported either way.
+¹ ACU consumption for session 2 was lost when the account changed mid-run. Recorded as
+unavailable rather than estimated. The rate card itself was never obtained in writing, so any
+dollar figure derived from it would be fabricated precision.
+
+### What session 2 actually shows
+
+**Zero corrections is not the same as zero defects.** The PR was merged **17 seconds** after it
+opened. CI was green, so it went in unread — 2,933 lines. That is the reviewer-fatigue failure
+mode reproduced on the first PR, in a repository built specifically to guard against it, by the
+people making the argument. It is reported here rather than quietly fixed because it is the most
+honest datum in this document.
+
+A proper review was run afterwards; findings are in `docs/PR1-REVIEW.md`.
+
+**What the agent did well, unprompted:**
+
+- Did not weaken the lint guardrail. It added two narrowly-scoped, commented exemptions and
+  disclosed both in the PR body rather than rewriting expressions to slip past the selectors.
+- Volunteered that the guardrail is weaker than its author claimed: the rule matches *syntax*,
+  so destructuring the roles property evades it. It raises the cost of an accidental inline role
+  check; it is not a containment boundary. That correction came from the agent, not the human.
+- Shipped a banner making the stub state visible, on the reasoning that a demo which silently
+  looks finished is how a prototype gets mistaken for a product.
+
+**Four design errors it found in the human-authored contract:**
+
+1. **No read API.** `packages/core/src/index.ts` declared only mutations, while the architecture
+   forbids the console from touching the database. Queue, detail and audit views are all reads —
+   the shell was unbuildable as specified.
+2. `requestApproval(action)` and `can(permission)` use different vocabularies with no mapping.
+3. `withAudit()` documents auditing denials but returns `T`, with no channel for the caller to
+   learn it was denied.
+4. Task 02 specified filesystem discovery of `tools/*/spec.ts`, which a bundler cannot do.
+
+All four are errors in the seed, authored by a human before any session ran. The guardrails
+constrained the agent; they did not make the human right.
