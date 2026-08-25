@@ -4,3 +4,5 @@ node_modules/
 *.db
 *.db-journal
 .env*.local
+*.db-shm
+*.db-wal

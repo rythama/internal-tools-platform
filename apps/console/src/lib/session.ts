@@ -6,13 +6,29 @@
  * mint a role by editing the cookie in devtools. Swapping in Okta or Entra replaces
  * this file and nothing else: everything downstream reads the Actor, never the cookie.
  */
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import type { Actor, Role } from '../core-adapter/index';
 
 export const SESSION_COOKIE = 'itp_session';
 
-/** Dev-only fallback. A real deployment fails closed instead of defaulting. */
-const SECRET = process.env['SESSION_SECRET'] ?? 'dev-only-insecure-session-secret';
+/**
+ * A per-process random key, used only when SESSION_SECRET is unset outside production.
+ * The previous hardcoded default was a published constant: anyone could compute a
+ * valid signature for `{ roles: ['admin'] }` and be an admin. Random-per-process keeps
+ * `npm run dev` working (cookies simply do not survive a restart) while making the
+ * signing key unknowable, and production refuses to start without a real secret.
+ */
+let ephemeralSecret: string | undefined;
+
+function sessionSecret(): string {
+  const configured = process.env['SESSION_SECRET'];
+  if (configured !== undefined && configured.length > 0) return configured;
+  if (process.env['NODE_ENV'] === 'production') {
+    throw new Error('SESSION_SECRET is required: refusing to sign sessions with a default key');
+  }
+  ephemeralSecret ??= randomBytes(32).toString('base64url');
+  return ephemeralSecret;
+}
 
 export const ALL_ROLES: readonly Role[] = [
   'kyc_reviewer',
@@ -38,7 +54,7 @@ export const DEMO_ACTORS: Readonly<Record<Role, Actor>> = {
 export const DEFAULT_ROLE: Role = 'kyc_reviewer';
 
 function sign(payload: string): string {
-  return createHmac('sha256', SECRET).update(payload).digest('base64url');
+  return createHmac('sha256', sessionSecret()).update(payload).digest('base64url');
 }
 
 export function encodeSession(actor: Actor): string {
@@ -57,22 +73,37 @@ export function decodeSession(cookieValue: string | undefined): Actor | undefine
 
   try {
     const parsed: unknown = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
-    return isActor(parsed) ? parsed : undefined;
+    return toActor(parsed);
   } catch {
     return undefined;
   }
 }
 
-function isActor(value: unknown): value is Actor {
-  if (typeof value !== 'object' || value === null) return false;
+/**
+ * Rebuilds the Actor from the claims this issuer is willing to honour, rather than
+ * returning the decoded object.
+ *
+ * Passing the payload through wholesale made every Actor field a claim: a cookie
+ * could carry `unmaskGrants` and mint itself a live PII grant, because `hasUnmaskGrant`
+ * reads them off the Actor. Grants are authority, not identity — they are issued
+ * per-request by the unmask flow (which records a reason), never asserted by the
+ * client. Anything not listed here is dropped, signature or no signature.
+ */
+function toActor(value: unknown): Actor | undefined {
+  if (typeof value !== 'object' || value === null) return undefined;
   const candidate = value as Record<string, unknown>;
+  const sub = candidate['sub'];
+  const email = candidate['email'];
   const claimedRoles = candidate['roles'];
-  return (
-    typeof candidate['sub'] === 'string' &&
-    typeof candidate['email'] === 'string' &&
-    Array.isArray(claimedRoles) &&
-    claimedRoles.every((role) => typeof role === 'string' && ALL_ROLES.includes(role as Role))
-  );
+
+  if (typeof sub !== 'string' || sub.length === 0) return undefined;
+  if (typeof email !== 'string' || email.length === 0) return undefined;
+  if (!Array.isArray(claimedRoles) || claimedRoles.length === 0) return undefined;
+  if (!claimedRoles.every((role): role is Role => isRole(typeof role === 'string' ? role : undefined))) {
+    return undefined;
+  }
+
+  return { sub, email, roles: [...claimedRoles] };
 }
 
 export function isRole(value: string | undefined): value is Role {

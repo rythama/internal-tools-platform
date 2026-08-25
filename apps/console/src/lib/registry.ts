@@ -6,22 +6,17 @@
  * module (§3.3), and the denial is auditable like any other.
  */
 import type { Actor, ToolSpec } from '../core-adapter/index';
-import { can, coreIsImplemented } from '../core-adapter/index';
-import { demoSpec, installDemoFixtures } from '../core-adapter/fixtures';
+import { can } from '../core-adapter/index';
 import { specs as registeredSpecs } from '../../../../tools/index';
 
+/**
+ * The specs this deployment hosts. There is no demo fallback any more: the shell used
+ * to synthesise a generic spec over an in-memory table when the registry was empty,
+ * which was right while no tool existed and is wrong now that one does — an empty
+ * registry should look empty.
+ */
 export function allSpecs(): readonly ToolSpec[] {
-  if (registeredSpecs.length > 0) return registeredSpecs;
-  installDemoFixtures();
-  return [demoSpec];
-}
-
-export function usingDemoSpec(): boolean {
-  return registeredSpecs.length === 0;
-}
-
-export function shellIsStubbed(): boolean {
-  return !coreIsImplemented || usingDemoSpec();
+  return registeredSpecs;
 }
 
 export function visibleSpecs(actor: Actor): readonly ToolSpec[] {
@@ -38,4 +33,9 @@ export function canViewTool(actor: Actor, spec: ToolSpec) {
 
 export function findSpec(key: string): ToolSpec | undefined {
   return allSpecs().find((spec) => spec.key === key);
+}
+
+/** Reverse lookup for the approval routes, which know a resource type, not a tool. */
+export function specForTable(table: string): ToolSpec | undefined {
+  return allSpecs().find((spec) => spec.queue.table === table);
 }

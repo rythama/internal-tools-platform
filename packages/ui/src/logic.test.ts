@@ -116,6 +116,52 @@ describe('resolveActions', () => {
     expect(allowed.find((action) => action.key === 'close')?.mode).toBe('direct');
   });
 
+  it('fails closed when the threshold names a field the row does not have', () => {
+    const typo: ToolSpec = {
+      ...spec,
+      actions: [
+        {
+          key: 'close',
+          label: 'Close',
+          permission: 'record.review',
+          intent: 'positive',
+          approval: { requiredApprovals: 1, disallowSelfApproval: true },
+          approvalThreshold: { field: 'scoer', gt: 79 },
+        },
+      ],
+    };
+    const { allowed } = resolveActions({ spec: typo, row: { id: 'REC-1', score: 10 }, actor, resource, can });
+    expect(allowed[0]?.mode).toBe('request');
+  });
+
+  it('fails closed when the threshold field is not a number', () => {
+    const { allowed } = resolveActions({
+      spec,
+      row: { id: 'REC-1', score: 'ten' },
+      actor,
+      resource,
+      can,
+    });
+    expect(allowed.find((action) => action.key === 'close')?.mode).toBe('request');
+  });
+
+  it('lets a tool add an approval hop the spec model cannot express', () => {
+    const { allowed } = resolveActions({
+      spec,
+      row: { id: 'REC-1', score: 10, sanctionsHit: true },
+      actor,
+      resource,
+      can,
+      requiresApproval: (key, row) => key === 'close' && row['sanctionsHit'] === true,
+    });
+    expect(allowed.find((action) => action.key === 'close')?.mode).toBe('request');
+    // The override adds a hop; it cannot remove the one an action without a threshold has.
+    expect(
+      resolveActions({ spec, row: { id: 'REC-1', score: 95 }, actor, resource, can, requiresApproval: () => false })
+        .allowed.find((action) => action.key === 'close')?.mode,
+    ).toBe('request');
+  });
+
   it('always requires approval when the spec declares one without a threshold', () => {
     const unconditional: ToolSpec = {
       ...spec,

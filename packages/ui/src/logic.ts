@@ -66,6 +66,9 @@ export function sortRows(
   return out;
 }
 
+/** Tool-supplied approval trigger, OR-ed with the spec's declared threshold. */
+export type ApprovalOverride = (actionKey: string, row: Row) => boolean;
+
 export type ResolvedAction = {
   key: string;
   label: string;
@@ -75,12 +78,22 @@ export type ResolvedAction = {
   reason: string;
 };
 
+/**
+ * Whether this action needs a second signature for this row.
+ *
+ * Fails closed on a threshold it cannot evaluate. A spec naming a field the row does
+ * not carry — a rename, a typo — is a configuration error, and the safe reading of an
+ * unevaluable threshold is "assume it is exceeded" rather than "assume it is not":
+ * the alternative silently turns dual control off for every row.
+ */
 function needsApproval(action: ToolSpec['actions'][number], row: Row): boolean {
   if (!action.approval) return false;
   const threshold = action.approvalThreshold;
   if (!threshold) return true;
+  if (!(threshold.field in row)) return true;
   const value = row[threshold.field];
-  return typeof value === 'number' && value > threshold.gt;
+  if (typeof value !== 'number') return true;
+  return value > threshold.gt;
 }
 
 /**
@@ -88,6 +101,10 @@ function needsApproval(action: ToolSpec['actions'][number], row: Row): boolean {
  * action that needs a second pair of eyes is offered as "Request approval" rather
  * than as the action itself. Denials are returned too, so the UI can explain them
  * instead of silently hiding capability.
+ *
+ * `requiresApproval` is the extension point for a trigger the spec model cannot
+ * express (`approvalThreshold` is a single numeric `>` on one field). It can only ever
+ * add an approval hop, never remove one.
  */
 export function resolveActions(args: {
   spec: ToolSpec;
@@ -95,6 +112,7 @@ export function resolveActions(args: {
   actor: Actor;
   resource: Resource;
   can: CanFn;
+  requiresApproval?: ApprovalOverride;
 }): { allowed: ResolvedAction[]; denied: Array<{ key: string; label: string; reason: string }> } {
   const allowed: ResolvedAction[] = [];
   const denied: Array<{ key: string; label: string; reason: string }> = [];
@@ -105,7 +123,8 @@ export function resolveActions(args: {
       denied.push({ key: action.key, label: action.label, reason: decision.reason });
       continue;
     }
-    const request = needsApproval(action, args.row);
+    const request =
+      needsApproval(action, args.row) || (args.requiresApproval?.(action.key, args.row) ?? false);
     allowed.push({
       key: action.key,
       label: request ? `Request approval: ${action.label}` : action.label,
