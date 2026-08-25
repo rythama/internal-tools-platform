@@ -18,6 +18,7 @@ export { AuditChain, type AuditChainProps, type AuditRowView } from './audit-cha
 export {
   applyFilters,
   cellText,
+  type ApprovalOverride,
   resolveActions,
   slaLabel,
   slaState,

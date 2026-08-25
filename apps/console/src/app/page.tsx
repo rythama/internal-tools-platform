@@ -1,6 +1,5 @@
 import { currentActor } from '../lib/actor';
 import { allSpecs, canViewTool, visibleSpecs } from '../lib/registry';
-import { StubBanner } from '../components/stub-banner';
 
 export default async function HomePage() {
   const actor = await currentActor();
@@ -9,7 +8,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <StubBanner />
       <div className="page-head">
         <div>
           <h1>Tools</h1>

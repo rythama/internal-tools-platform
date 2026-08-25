@@ -1,5 +1,5 @@
 import type { Actor, Resource, ToolSpec } from '@itp/core';
-import { resolveActions, type CanFn, type Row } from './logic';
+import { resolveActions, type ApprovalOverride, type CanFn, type Row } from './logic';
 
 export type ActionBarProps = {
   spec: ToolSpec;
@@ -9,6 +9,8 @@ export type ActionBarProps = {
   can: CanFn;
   /** POST target. The handler re-checks can() server-side; this bar is UI only. */
   endpoint: string;
+  /** Tool-supplied approval trigger for rules the spec model cannot express. */
+  requiresApproval?: ApprovalOverride;
 };
 
 /**
@@ -19,8 +21,15 @@ export type ActionBarProps = {
  * them entirely trains operators to file tickets asking why a button is missing;
  * showing the reason makes the policy legible.
  */
-export function ActionBar({ spec, row, actor, resource, can, endpoint }: ActionBarProps) {
-  const { allowed, denied } = resolveActions({ spec, row, actor, resource, can });
+export function ActionBar({ spec, row, actor, resource, can, endpoint, requiresApproval }: ActionBarProps) {
+  const { allowed, denied } = resolveActions({
+    spec,
+    row,
+    actor,
+    resource,
+    can,
+    ...(requiresApproval ? { requiresApproval } : {}),
+  });
 
   return (
     <form className="action-bar" method="post" action={endpoint}>

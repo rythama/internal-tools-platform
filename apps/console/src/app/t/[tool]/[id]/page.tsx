@@ -3,7 +3,9 @@ import { ActionBar, ApprovalPanel, Detail } from '@itp/ui';
 import { can, canVoteOn, getRow, listApprovals } from '../../../../core-adapter/index';
 import { currentActor } from '../../../../lib/actor';
 import { canViewTool, findSpec } from '../../../../lib/registry';
-import { StubBanner } from '../../../../components/stub-banner';
+import { effectsFor } from '../../../../tools/effects';
+import { KYC_SPEC_KEY } from '../../../../tools/kyc-review';
+import { UnmaskPanel } from '../../../../components/unmask-panel';
 
 type Props = {
   params: Promise<{ tool: string; id: string }>;
@@ -44,12 +46,14 @@ export default async function ToolDetailPage({ params, searchParams }: Props) {
   if (!row) notFound();
 
   const approvals = listApprovals(spec.queue.table, id, actor);
+  const effects = effectsFor(spec.key);
+  // Offering the unmask form is a UI decision; whether an unmask happens is core's.
+  const mayAskToUnmask = spec.key === KYC_SPEC_KEY && can(actor, 'pii.unmask', resource).allowed;
   const flash = typeof query['flash'] === 'string' ? query['flash'] : undefined;
   const flashError = query['error'] === '1';
 
   return (
     <>
-      <StubBanner />
       <div className="page-head">
         <div>
           <h1>
@@ -71,10 +75,12 @@ export default async function ToolDetailPage({ params, searchParams }: Props) {
             resource={resource}
             can={can}
             endpoint={`/api/t/${spec.key}/${encodeURIComponent(id)}/action`}
+            {...(effects ? { requiresApproval: effects.requiresApproval } : {})}
           />
         </div>
 
         <aside className="panel">
+          {mayAskToUnmask ? <UnmaskPanel caseId={id} /> : null}
           <h3>Approvals</h3>
           <ApprovalPanel
             approvals={approvals}

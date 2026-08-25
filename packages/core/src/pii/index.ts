@@ -55,16 +55,24 @@ export function maskValues<T extends Record<string, unknown>>(table: string, row
  * The contract's `maskRow`. Two gates guard an unmask: the policy must allow
  * `pii.unmask` for this actor, and the actor must hold an unexpired grant for this
  * resource type. Either failure is audited as a denial before it throws.
+ *
+ * `opts.reason` is the caller's stated purpose. It rides on the audit diff of both the
+ * allow and the denial, so "who looked, when" is also "and why they said they needed
+ * to" — the field names are recorded, never the values.
  */
 export function maskRow<T extends Record<string, unknown>>(
   table: string,
   row: T,
   actor: Actor,
-  opts?: { unmask?: boolean },
+  opts?: { unmask?: boolean; reason?: string },
 ): T {
   if (!opts?.unmask) return maskValues(table, row);
 
   const resource = { type: table, id: String(row['id'] ?? 'unknown') };
+  const context = {
+    fields: Object.keys(classificationFor(table)),
+    ...(opts.reason === undefined ? {} : { reason: opts.reason }),
+  };
   const decision = can(actor, 'pii.unmask', resource);
   if (!decision.allowed) {
     throw auditDenial({
@@ -72,7 +80,7 @@ export function maskRow<T extends Record<string, unknown>>(
       action: 'pii.unmask',
       resource,
       decisionReason: decision.reason,
-      diff: { fields: Object.keys(classificationFor(table)) },
+      diff: context,
     });
   }
 
@@ -82,7 +90,7 @@ export function maskRow<T extends Record<string, unknown>>(
       action: 'pii.unmask',
       resource,
       decisionReason: `no live unmask grant for ${table}`,
-      diff: { fields: Object.keys(classificationFor(table)) },
+      diff: context,
     });
   }
 
@@ -94,7 +102,7 @@ export function maskRow<T extends Record<string, unknown>>(
       resource,
       decision: 'allow',
       decisionReason: decision.reason,
-      diff: { fields: Object.keys(classificationFor(table)) },
+      diff: context,
     }),
   );
 

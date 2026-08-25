@@ -12,44 +12,15 @@
  *      see is absent from the result, not hidden by the UI.
  */
 import { getTableColumns } from 'drizzle-orm';
-import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
 import { auditRowsNewestFirst } from '../audit/index';
-import { approvalsFor, toApprovalRecord } from '../approvals/index';
+import { approvalsFor, findApproval, toApprovalRecord } from '../approvals/index';
 import { db } from '../db/client';
-import {
-  approvalVotes,
-  approvals,
-  auditLog,
-  featureFlags,
-  kycCases,
-  refunds,
-} from '../db/schema';
-import { maskValues } from '../pii/index';
+import { primaryKeyValue, tableFor } from '../db/tables';
+import { maskRow, maskValues } from '../pii/index';
 import { can } from '../policy/index';
 import type { Actor, ApprovalRecord, AuditRecord } from '../types';
 
-/**
- * Table name → drizzle table. A spec names its table as a string, and this is the
- * one place that string is resolved; an unknown name reads as empty rather than
- * throwing, so a misconfigured spec degrades to "no rows" instead of a 500.
- */
-const TABLES: Readonly<Record<string, SQLiteTable>> = {
-  audit_log: auditLog,
-  approvals,
-  approval_votes: approvalVotes,
-  kyc_cases: kycCases,
-  refunds,
-  feature_flags: featureFlags,
-};
-
-export function isKnownTable(table: string): boolean {
-  return table in TABLES;
-}
-
-function primaryKeyValue(row: Record<string, unknown>): string {
-  const id = row['id'] ?? row['key'];
-  return id === undefined || id === null ? '' : String(id);
-}
+export { isKnownTable } from '../db/tables';
 
 /**
  * Row attributes the policy is allowed to see. Passing the whole row would hand PII
@@ -58,7 +29,7 @@ function primaryKeyValue(row: Record<string, unknown>): string {
  */
 const POLICY_ATTRS = ['status', 'riskScore', 'amountCents', 'environment', 'enabled'] as const;
 
-function policyAttrs(row: Record<string, unknown>): Record<string, unknown> {
+export function policyAttrs(row: Record<string, unknown>): Record<string, unknown> {
   const attrs: Record<string, unknown> = {};
   for (const field of POLICY_ATTRS) {
     if (field in row) attrs[field] = row[field];
@@ -74,8 +45,8 @@ function readable(actor: Actor, table: string, row: Record<string, unknown>): bo
   }).allowed;
 }
 
-function selectAll(table: string): Array<Record<string, unknown>> {
-  const target = TABLES[table];
+export function selectAll(table: string): Array<Record<string, unknown>> {
+  const target = tableFor(table);
   if (!target) return [];
   // Selecting the column map keeps the camelCase field names the specs and the UI
   // use, rather than the snake_case the database stores.
@@ -96,6 +67,37 @@ export function getRow<T extends Record<string, unknown>>(
   const row = selectAll(table).find((candidate) => primaryKeyValue(candidate) === id);
   if (!row || !readable(actor, table, row)) return undefined;
   return maskValues(table, row) as T;
+}
+
+/**
+ * The only path to an unmasked row, and the reason `getRow` needs no `unmask` flag.
+ *
+ * Reads the row unmasked from storage and hands it to `maskRow(…, { unmask: true })`,
+ * which is where the two gates and the audit record live (§3.5). A caller without the
+ * policy or without a live grant gets a `PolicyDeniedError` and an audited denial.
+ */
+export function revealRow<T extends Record<string, unknown>>(
+  table: string,
+  id: string,
+  actor: Actor,
+  reason?: string,
+): T | undefined {
+  const row = selectAll(table).find((candidate) => primaryKeyValue(candidate) === id);
+  if (!row || !readable(actor, table, row)) return undefined;
+  return maskRow(table, row, actor, { unmask: true, ...(reason === undefined ? {} : { reason }) }) as T;
+}
+
+/**
+ * One approval by id, for the vote route: after a vote satisfies an approval, the
+ * caller has to know which action on which resource it just authorized.
+ */
+export function getApproval(approvalId: number, actor: Actor): ApprovalRecord | undefined {
+  const row = findApproval(approvalId);
+  if (!row) return undefined;
+  if (!can(actor, 'record.read', { type: row.resourceType, id: row.resourceId }).allowed) {
+    return undefined;
+  }
+  return toApprovalRecord(row);
 }
 
 /** Newest first. Requires an auditor-capable role; scoped by can() like everything else. */

@@ -1,7 +1,6 @@
 import { AuditChain } from '@itp/ui';
 import { can, listAuditRows, verifyAuditChain } from '../../core-adapter/index';
 import { currentActor } from '../../lib/actor';
-import { StubBanner } from '../../components/stub-banner';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +22,6 @@ export default async function AuditPage() {
 
   return (
     <>
-      <StubBanner />
       <div className="page-head">
         <div>
           <h1>Audit chain</h1>

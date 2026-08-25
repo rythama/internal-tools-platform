@@ -42,6 +42,14 @@ export { can } from './policy/index';
  */
 export { withAudit, verifyAuditChain } from './audit/index';
 
+/**
+ * Records a refusal the policy cannot express — a domain precondition, a missing
+ * justification — as a deny link on the chain, and returns the error to throw. A tool
+ * that refuses an action still has to leave a trace of the attempt (§3.4), and this is
+ * the only supported way for it to write one.
+ */
+export { auditDenial as recordDenial } from './audit/index';
+
 /** Maker-checker. Returns the approval record; applies the action once satisfied. */
 export { requestApproval, castVote } from './approvals/index';
 
@@ -52,6 +60,21 @@ export { requestApproval, castVote } from './approvals/index';
 export { listRows, getRow, listAuditRows, listApprovals } from './read/index';
 
 /**
+ * `revealRow` is the audited counterpart to `getRow`: same row, unmasked, gated by
+ * `pii.unmask` plus a live grant and recorded with the caller's stated reason.
+ * `getApproval` resolves one pending approval so a voter can be told what they signed.
+ */
+export { revealRow, getApproval } from './read/index';
+
+/**
+ * The domain write path. A tool cannot reach `withAudit`'s transaction handle from
+ * outside this package, so patching a row goes through here — which means through
+ * `can()` and onto the audit chain, with classified columns redacted in the diff.
+ */
+export { updateRow } from './write/index';
+export type { RowDiff } from './write/index';
+
+/**
  * Masks columns classified in schema.ts `piiColumns` unless the actor holds a
  * matching unmask grant. Calling with `unmask: true` emits its own audit event.
  */
@@ -59,7 +82,7 @@ export function maskRow<T extends Record<string, unknown>>(
   table: keyof typeof piiColumns,
   row: T,
   actor: Actor,
-  opts?: { unmask?: boolean },
+  opts?: { unmask?: boolean; reason?: string },
 ): T {
   return maskRowImpl(table, row, actor, opts);
 }

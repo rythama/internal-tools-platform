@@ -9,7 +9,6 @@
  * "forgot to register it" is a red test rather than a missing nav item.
  */
 import type { ToolSpec } from '@itp/core';
+import { spec as kycReview } from './kyc-review/spec.js';
 
-// Session 3 adds: import { spec as kycReview } from './kyc-review/spec.js';
-
-export const specs: readonly ToolSpec[] = [];
+export const specs: readonly ToolSpec[] = [kycReview];

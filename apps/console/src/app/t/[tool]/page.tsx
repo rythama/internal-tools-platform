@@ -4,7 +4,6 @@ import type { FilterState } from '@itp/ui';
 import { listRows } from '../../../core-adapter/index';
 import { currentActor } from '../../../lib/actor';
 import { canViewTool, findSpec } from '../../../lib/registry';
-import { StubBanner } from '../../../components/stub-banner';
 import { parseSort, readFilters } from '../../../lib/query';
 
 type Props = {
@@ -35,7 +34,6 @@ export default async function ToolQueuePage({ params, searchParams }: Props) {
 
   return (
     <>
-      <StubBanner />
       <div className="page-head">
         <div>
           <h1>{spec.title}</h1>
