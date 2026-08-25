@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { Queue } from '@itp/ui';
+import { DEMO_EPOCH } from '@itp/core';
 import type { FilterState } from '@itp/ui';
 import { listRows } from '../../../core-adapter/index';
 import { currentActor } from '../../../lib/actor';
@@ -40,7 +41,10 @@ export default async function ToolQueuePage({ params, searchParams }: Props) {
           <p className="muted">{spec.description}</p>
         </div>
       </div>
-      <Queue spec={spec} rows={rows} filters={filters} {...(sort ? { sort } : {})} basePath={`/t/${spec.key}`} />
+      {/* SLA is judged against the package clock, not the wall clock: the seed is
+          pinned to a demo epoch (audit hashes depend on it), so wall-clock "now"
+          would mark every seeded row breached and the badge would carry no signal. */}
+      <Queue spec={spec} rows={rows} filters={filters} {...(sort ? { sort } : {})} basePath={`/t/${spec.key}`} now={new Date(DEMO_EPOCH)} />
     </>
   );
 }

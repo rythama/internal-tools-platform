@@ -16,8 +16,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Header actor={actor} specs={specs} />
-        <main>{children}</main>
+        <div className="shell">
+          <Header actor={actor} specs={specs} />
+          <main>{children}</main>
+        </div>
       </body>
     </html>
   );

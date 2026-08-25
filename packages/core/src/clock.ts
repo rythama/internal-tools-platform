@@ -5,6 +5,15 @@
  * deterministic cannot call `Date.now()`. The seed pins the clock; everything else
  * gets wall time.
  */
+/**
+ * The reference instant the seed is built around: seeded timestamps spread from
+ * ~5 days before to ~3 days after it. UI features that compare against "now"
+ * (SLA badges) should compare against THIS when showing seeded data — wall-clock
+ * time drifts away from the pinned data a little more every day, until every row
+ * reads as breached and the badge carries no signal.
+ */
+export const DEMO_EPOCH = '2025-01-06T09:00:00.000Z';
+
 let fixed: { at: number; stepMs: number } | undefined;
 
 export function now(): string {

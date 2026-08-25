@@ -107,7 +107,7 @@ export { policyAttrs } from './read/index';
  * `updatedAt`) must read the same clock the audit chain does, or a pinned test
  * clock would produce nondeterministic rows next to deterministic audit entries.
  */
-export { now } from './clock';
+export { DEMO_EPOCH, now } from './clock';
 
 /**
  * Masks columns classified in schema.ts `piiColumns` unless the actor holds a

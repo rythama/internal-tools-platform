@@ -27,9 +27,28 @@ export function Queue(props: QueueProps) {
 
   const rows = sortRows(applyFilters(props.rows, filters), sort);
   const sla = spec.queue.sla;
+  const stats = queueStats(rows, sla?.dueField, now);
 
   return (
     <section className="queue">
+      <div className="stat-strip">
+        <div className="stat">
+          <div className="stat-value">{stats.total}</div>
+          <div className="stat-label">in view</div>
+        </div>
+        {sla ? (
+          <div className={stats.breached > 0 ? 'stat stat-bad' : 'stat'}>
+            <div className="stat-value">{stats.breached}</div>
+            <div className="stat-label">SLA breached</div>
+          </div>
+        ) : null}
+        {stats.topStatuses.map(([status, count]) => (
+          <div key={status} className="stat">
+            <div className="stat-value">{count}</div>
+            <div className="stat-label">{status.replaceAll('_', ' ')}</div>
+          </div>
+        ))}
+      </div>
       {spec.queue.filters && spec.queue.filters.length > 0 ? (
         <form className="queue-filters" method="get" action={basePath}>
           {spec.queue.filters.map((filter) => (
@@ -113,6 +132,22 @@ export function Queue(props: QueueProps) {
       </p>
     </section>
   );
+}
+
+/**
+ * Summary of the rows in view. Computed from the same filtered set the table shows,
+ * so the numbers always agree with what the operator is looking at.
+ */
+function queueStats(rows: readonly Row[], slaField: string | undefined, now: Date) {
+  const byStatus = new Map<string, number>();
+  let breached = 0;
+  for (const row of rows) {
+    const status = typeof row['status'] === 'string' ? (row['status'] as string) : undefined;
+    if (status) byStatus.set(status, (byStatus.get(status) ?? 0) + 1);
+    if (slaField && slaState(row[slaField], now) === 'breached') breached += 1;
+  }
+  const topStatuses = [...byStatus.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3);
+  return { total: rows.length, breached, topStatuses };
 }
 
 /** Fields whose values are a closed vocabulary; styled as chips. */

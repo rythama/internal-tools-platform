@@ -8,14 +8,14 @@
  * Fake data only: names, tax IDs and card digits below are generated, and the tax
  * IDs use the 900-series range that is never issued.
  */
-import { useFixedClock, useSystemClock } from '../clock';
+import { DEMO_EPOCH, useFixedClock, useSystemClock } from '../clock';
 import { requestApproval, castVote } from '../approvals/index';
 import { verifyAuditChain, withAudit } from '../audit/index';
 import { closeDatabase, databasePath, db, raw } from './client';
 import { featureFlags, kycCases, refunds } from './schema';
 import type { Actor } from '../types';
 
-const SEED_EPOCH = '2025-01-06T09:00:00.000Z';
+const SEED_EPOCH = DEMO_EPOCH;
 
 /** mulberry32: tiny, seeded, and stable across Node versions. */
 function prng(seed: number): () => number {
