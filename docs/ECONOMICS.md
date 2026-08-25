@@ -47,12 +47,52 @@ Not a cost saving — a **capability purchase**, priced honestly:
 - **The last ~30% of compliance capability therefore costs ~$260–275K/yr.** That is a
   legitimate budget question, and a fatal thing to mis-sell as savings.
 
-*How the equivalent-annual figures are computed [A]: each option's 10-year cash flows versus
-the optimized baseline (build capex, migration, infrastructure ~$90K/yr, ownership FTEs at
-fully loaded cost, pen tests, minus recovered license spend) are discounted at 15% and the
-resulting NPV is annualized over the horizon (annuity factor ~5.0; e.g. −$2.0M NPV →
-~$400K/yr). The dominant input is ownership headcount, not software: ±0.5 FTE moves the
-figure ~$130K/yr.*
+### The arithmetic behind those figures [A]
+
+**Steady-state run rate, 13 tools** (central case; people at $160/hr fully loaded, per-app
+maintenance at parity on both sides):
+
+| | Own primitives + rent UI | Optimized Power Apps |
+|---|---:|---:|
+| Licenses (Power Apps / Retool Enterprise) | $120K | $225K |
+| Infrastructure | $70K | — |
+| People (owner, on-call, deps/CVE, per-tool maintenance) | $314K | $190K |
+| Security (pen test / targeted review) | $30K | $12K |
+| Recurring re-certification, incidents, departure EV, OCR, ACUs, soft costs | $146K | $36K |
+| **Total** | **$680K/yr** | **$463K/yr** |
+
+Steady-state gap: **−$217K/yr ≈ −$220K/yr.** The mechanism in one line: you retire $225K of
+license and replace it with $190K of infrastructure plus rented-UI license (a $35K/yr win),
+then add roughly $255K/yr of labor, compliance, and operational overhead you did not
+previously carry.
+
+**One-time cost, all-in ≈ $1.25M:** primitives layer $558K (2,760 h at 1.8x leverage and a
+1.3x review tax, identity-binding seam included, 25% contingency) + migrating 3 existing
+tools $144K + historical Dataverse extraction with fidelity proof $170K + regulatory
+re-certification $123K + training ~300 ops users $95K + hiring/ramp EV $36K + dual-run
+reconciliation $54K + vendor-dependency EV $35K + OCR/IDP parity $32K.
+
+**Cash flows and NPV** (8-tool case, $000s; year 1 carries the platform, the migrations, and
+a full year of Power Apps that cannot switch off before month 9):
+
+| | Y1 | Y2 | Y3+ |
+|---|---:|---:|---:|
+| Annual net vs optimized baseline | −1,300 | −190 | −225/yr |
+
+NPV at 15% over 10 years: −1,300(0.870) − 190(0.756) − 225 × 3.39 ≈ **−$2.0M**. The
+cumulative curve never turns positive, so there is no payback at any horizon.
+
+**Equivalent annual cost:** −$2.0M ÷ 5.02 (the 10-year annuity factor at 15%) ≈
+**$400K/yr**. The rent-UI-only option, priced by the same method (license + gap-closing
+build + ~0.5–0.6 FTE, minus recovered spend), annualizes to **~$125–145K/yr**; the
+difference, **~$260–275K/yr**, is the price of the last ~30% of capability.
+
+The dominant input throughout is ownership headcount, not software: ±0.5 FTE moves the
+equivalent-annual figure by ~$130K/yr, which is why the pilot measures ownership load
+instead of assuming it. One honest cross-check the model surfaced: at 13 tools the hybrid's
+*run rate* ($680K) slightly exceeds a full custom build's ($663K), because the Retool
+Enterprise license costs more than the frontend ownership it displaces. The hybrid still
+wins on NPV ($1.25M capex vs $1.50M) and on execution risk, but not on run rate.
 
 ## What the prototype measured (vs. what the model assumed)
 
