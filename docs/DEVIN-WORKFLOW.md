@@ -83,10 +83,11 @@ load — not agent speed — is the binding constraint on this platform's econom
 A correction is any human intervention before merge: a redirect, a "no, do it this
 way," or a fix authored by hand. Zero is a legitimate result. So is six.
 
-| # | Session | Started | PR opened | Wall-clock | ACUs | Corrections | Net LOC | Notes |
+| # | Session | Started | PR opened | Wall-clock | Human review | Corrections | Net LOC | Notes |
 |---|---|---|---|---|---|---|---|---|
-| 1 | core primitives | 2026-08-24 20:24 | — | — | — | — | — | **Operator-stopped** during an account migration. Not a Devin failure — no conclusion should be drawn from this row. Re-running. |
-| 2 | console shell | 2026-08-24 20:24 | 20:33:40 | **9m 40s** | unavailable¹ | **0** | +2,923 / −10 | [PR #1](https://github.com/rythama/internal-tools-platform/pull/1), merged. 54 tests, `npm run verify` green. |
+| 1a | core primitives | 20:24 | — | — | — | — | — | **Operator-stopped** during an account migration. Not a Devin failure; draw no conclusion from this row. |
+| 2 | console shell | 20:24 | 20:33:40 | **9m 40s** | **0 min** | 0 | +2,923 | [PR #1](https://github.com/rythama/internal-tools-platform/pull/1). Merged 17s after opening — unread. |
+| 1b | core primitives | 20:53 | 21:00:06 | **7m 06s** | **5–10 min** | 0 | +2,228 | [PR #2](https://github.com/rythama/internal-tools-platform/pull/2). 216 tests. Reviewed, then merged. |
 | 3 | KYC review queue | | | | | | | not started |
 | 4 | refunds + flags | | | | | | | not started |
 
@@ -95,6 +96,29 @@ unavailable rather than estimated. The rate card itself was never obtained in wr
 dollar figure derived from it would be fabricated precision.
 
 ### What session 2 actually shows
+
+### The review finding, which is the point of this table
+
+Session 1b produced **2,228 lines in 7 minutes**. It was reviewed for **5–10 minutes** before
+merging.
+
+Commonly cited careful-review throughput is 200–400 LOC/hour [A]. At that rate, 2,228 lines is
+**six to eleven hours**. The review that actually happened was roughly **1–2% of that**.
+
+This matters because the economic model assumes review is the binding constraint and *inflates*
+~1.3x on agent-authored code. That is not what happened here. Faced with 2,228 lines arriving in
+seven minutes, the reviewer did not spend more hours — **the depth of review silently fell to fit
+the time available.**
+
+> **The review tax does not get paid. It gets skipped.**
+
+That is the honest failure mode, and it is worse than the one the model priced, because it is
+invisible: CI stays green, the PR merges, and the cost surfaces later as a defect rather than
+sooner as an hour. Both merges in this repository followed the pattern, in a repository built
+specifically to prevent it, by the people making the argument.
+
+The three real defects found in this codebase were found by a rival Devin session and by an
+automated review pass — **none by a human reading the diff.**
 
 **Zero corrections is not the same as zero defects.** The PR was merged **17 seconds** after it
 opened. CI was green, so it went in unread — 2,933 lines. That is the reviewer-fatigue failure
