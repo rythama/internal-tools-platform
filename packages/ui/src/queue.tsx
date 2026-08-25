@@ -1,5 +1,5 @@
 import type { ToolSpec } from '@itp/core';
-import { applyFilters, cellText, slaLabel, slaState, sortRows, type FilterState, type Row } from './logic';
+import { applyFilters, cellText, formatCell, slaLabel, slaState, sortRows, type FilterState, type Row } from './logic';
 
 export type QueueProps = {
   spec: ToolSpec;
@@ -110,10 +110,10 @@ export function Queue(props: QueueProps) {
                     ) : isEnumField(column.field) ? (
                       /* Presentation only: state-like values read as chips, not prose. */
                       <span className={`pill pill-${cellText(row[column.field])}`}>
-                        {cellText(row[column.field])}
+                        {cellText(row[column.field]).replaceAll('_', ' ')}
                       </span>
                     ) : (
-                      cellText(row[column.field])
+                      formatCell(column.field, row[column.field])
                     )}
                   </td>
                 ))}

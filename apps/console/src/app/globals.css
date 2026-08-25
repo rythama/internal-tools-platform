@@ -5,23 +5,27 @@
    a console where nothing is reads as a marketing site. Neither is an ops tool. */
 
 :root {
-  --bg: #0d1014;
-  --panel: #14181e;
-  --panel-2: #1a1f27;
-  --line: #262c35;
-  --line-strong: #333b47;
-  --text: #e7eaef;
-  --muted: #8b95a5;
-  --faint: #5d6675;
-  --accent: #45b3a4;
-  --accent-quiet: #1c3d39;
-  --ok: #4ba577;
-  --ok-bg: #14261d;
-  --warn: #c99a3c;
-  --warn-bg: #2a2213;
-  --bad: #d96a6a;
-  --bad-bg: #2b1719;
-  --radius: 6px;
+  /* Light, warm-neutral ground: the language of financial software people trust.
+     One deep accent; semantic color reserved for state. */
+  --bg: #f7f7f5;
+  --panel: #ffffff;
+  --panel-2: #f2f3f1;
+  --line: #e6e7e4;
+  --line-strong: #d2d4d0;
+  --text: #191c1f;
+  --muted: #5f6a72;
+  --faint: #949ca4;
+  --accent: #0d7a6d;
+  --accent-quiet: #e3f1ee;
+  --ok: #1a7f4e;
+  --ok-bg: #e7f4ec;
+  --warn: #9a6700;
+  --warn-bg: #fdf3dc;
+  --bad: #c03538;
+  --bad-bg: #fbecec;
+  --shadow-sm: 0 1px 2px rgb(23 26 31 / 0.06);
+  --shadow-md: 0 4px 16px rgb(23 26 31 / 0.08);
+  --radius: 8px;
   --sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --mono: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -33,9 +37,10 @@ html, body {
   padding: 0;
   background: var(--bg);
   color: var(--text);
-  font: 13.5px/1.5 var(--sans);
+  font: 14px/1.5 var(--sans);
   -webkit-font-smoothing: antialiased;
 }
+::selection { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 
 main {
   max-width: 1200px;
@@ -69,14 +74,11 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 }
 
 main {
-  max-width: 1080px;
-  margin: 0;
-  padding: 30px 40px 72px;
+  width: 100%;
+  max-width: 1160px;
+  margin-inline: auto;
+  padding: 34px 44px 80px;
   min-width: 0;
-  /* A faint accent wash at the top gives the flat ground one degree of depth. */
-  background:
-    radial-gradient(52rem 18rem at 18% -6rem, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
-    var(--bg);
 }
 
 /* ------------------------------------------------------------ sidebar */
@@ -87,7 +89,7 @@ main {
   gap: 4px;
   background: var(--panel);
   border-right: 1px solid var(--line);
-  padding: 18px 12px 16px;
+  padding: 20px 14px 16px;
   position: sticky;
   top: 0;
   height: 100vh;
@@ -104,10 +106,11 @@ main {
 }
 .brand:hover { text-decoration: none; color: var(--text); }
 .brand-mark {
-  width: 18px;
-  height: 18px;
-  border-radius: 5px;
-  background: linear-gradient(135deg, var(--accent), #2c7a70);
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #14a08f, var(--accent) 60%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.25);
   flex: none;
 }
 
@@ -136,6 +139,7 @@ main {
   background: var(--panel-2);
   text-decoration: none;
 }
+.sidebar nav a { color: var(--muted); }
 
 .sidebar-foot {
   margin-top: auto;
@@ -167,14 +171,14 @@ main {
 .role-switcher select {
   flex: 1;
   min-width: 0;
-  background: var(--panel-2);
+  background: var(--panel);
   color: var(--text);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   font: 12px var(--mono);
   padding: 5px 8px;
 }
-.role-switcher select:hover { border-color: var(--line-strong); }
+.role-switcher select:hover { border-color: var(--faint); }
 .role-switcher button {
   font: 500 12px var(--sans);
   color: var(--muted);
@@ -226,6 +230,7 @@ main {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--panel);
+  box-shadow: var(--shadow-sm);
   transition: border-color 130ms, transform 130ms, box-shadow 130ms;
 }
 .tool-card > *, .tool-card-link { display: block; padding: 18px 20px; }
@@ -234,7 +239,7 @@ main {
 .tool-card:has(.tool-card-link):hover {
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 0.28);
+  box-shadow: var(--shadow-md);
 }
 .tool-card h2 { margin: 0; font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
 .tool-card p { margin: 8px 0 0; }
@@ -260,7 +265,7 @@ main {
 .tool-card-stats .stat-flag,
 .tool-card-stats .stat-flag strong { color: var(--bad); }
 
-.platform-card { background: color-mix(in srgb, var(--accent) 4%, var(--panel)); padding: 18px 20px; }
+.platform-card { background: color-mix(in srgb, var(--accent) 3%, var(--panel)); padding: 18px 20px; }
 .platform-card h2, .platform-card p { padding: 0; }
 .tool-card-denied { opacity: 0.75; }
 .tool-card-denied > * { padding: 0; }
@@ -283,11 +288,12 @@ main {
   margin: 0 0 16px;
 }
 .stat {
-  min-width: 118px;
+  min-width: 122px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
-  padding: 10px 14px 9px;
+  box-shadow: var(--shadow-sm);
+  padding: 11px 15px 10px;
 }
 .stat-value {
   font: 600 20px/1.2 var(--sans);
@@ -329,11 +335,13 @@ main {
 .queue-table,
 .audit-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   background: var(--panel);
+  box-shadow: var(--shadow-sm);
   font-variant-numeric: tabular-nums;
 }
 .queue-table th,
@@ -350,7 +358,7 @@ main {
 .queue-table td,
 .audit-table td {
   border-bottom: 1px solid var(--line);
-  padding: 8px 12px;
+  padding: 9px 13px;
   font: 12.5px var(--mono);
 }
 .queue-table tbody tr:hover td,
@@ -368,10 +376,11 @@ main {
 
 .badge, .pill {
   display: inline-block;
-  font: 500 11px/1 var(--mono);
-  padding: 3px 8px;
+  font: 600 11px/1 var(--sans);
+  letter-spacing: 0.01em;
+  padding: 4px 9px;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
+  border: none;
   color: var(--muted);
   background: var(--panel-2);
   white-space: nowrap;
@@ -380,17 +389,17 @@ main {
 .pill-approved, .pill-applied, .pill-settled,
 .badge-state-approved, .badge-state-applied,
 .badge-vote-approve, .badge-decision-allow, .badge-sla-ok {
-  color: var(--ok); border-color: color-mix(in srgb, var(--ok) 40%, transparent);
+  color: var(--ok);
   background: var(--ok-bg);
 }
 .pill-rejected,
 .badge-state-rejected, .badge-vote-reject, .badge-decision-deny {
-  color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, transparent);
+  color: var(--bad);
   background: var(--bad-bg);
 }
 .pill-escalated, .pill-pending_approval, .pill-prod,
 .badge-state-pending, .badge-sla-due-soon {
-  color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, transparent);
+  color: var(--warn);
   background: var(--warn-bg);
 }
 .badge-sla-breached {
@@ -463,24 +472,25 @@ main {
 .btn {
   font: 500 13px var(--sans);
   color: var(--text);
-  background: var(--panel-2);
+  background: var(--panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   padding: 6px 14px;
   cursor: pointer;
-  transition: border-color 120ms, background 120ms;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 120ms, background 120ms, box-shadow 120ms;
 }
 .btn:hover { border-color: var(--faint); }
 
 .btn-positive {
-  background: var(--accent-quiet);
-  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
-  color: var(--accent);
-}
-.btn-positive:hover {
   background: var(--accent);
   border-color: var(--accent);
-  color: #08110f;
+  color: #ffffff;
+}
+.btn-positive:hover {
+  background: color-mix(in srgb, var(--accent) 88%, #000);
+  border-color: color-mix(in srgb, var(--accent) 88%, #000);
+  color: #ffffff;
 }
 
 .btn-destructive {

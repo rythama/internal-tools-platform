@@ -13,6 +13,27 @@ export type CanFn = (actor: Actor, action: string, resource: Resource) => Decisi
 
 export type FilterState = Readonly<Record<string, string>>;
 
+const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+  hour12: false, timeZone: 'UTC',
+});
+
+/**
+ * Field-aware display formatting. Raw ISO strings and integer cents are storage
+ * shapes, not operator-facing values — a fintech ops screen that shows
+ * "2025-01-04T06:00:00.000Z" or "5000000" reads as a debug view.
+ */
+export function formatCell(field: string, value: unknown): string {
+  if (typeof value === 'number' && /Cents$/.test(field)) return usd.format(value / 100);
+  if (typeof value === 'string' && ISO_RE.test(value)) {
+    const at = Date.parse(value);
+    if (!Number.isNaN(at)) return dateFmt.format(at);
+  }
+  return cellText(value);
+}
+
 export function cellText(value: unknown): string {
   if (value === null || value === undefined) return '—';
   if (typeof value === 'boolean') return value ? 'yes' : 'no';

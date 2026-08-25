@@ -1,5 +1,5 @@
 import type { ToolSpec } from '@itp/core';
-import { cellText, type Row } from './logic';
+import { cellText, formatCell, type Row } from './logic';
 
 export type DetailProps = {
   spec: ToolSpec;
@@ -21,7 +21,7 @@ export function Detail({ spec, row, labels }: DetailProps) {
           <h3>{section.label}</h3>
           <dl>
             {section.fields.map((field) => {
-              const text = cellText(row[field]);
+              const text = formatCell(field, row[field]);
               const masked = isMaskedValue(text);
               return (
                 <div key={field} className="detail-row">

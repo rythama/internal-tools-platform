@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
-import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
+import { IBM_Plex_Mono, Instrument_Sans } from 'next/font/google';
 import './globals.css';
 
-/* Same type system as the architecture review: Plex Sans for chrome, Plex Mono for
-   data. Self-hosted by next/font — no runtime font request leaves the machine. */
-const sans = IBM_Plex_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-sans' });
+/* Fintech-grade type: Instrument Sans for the chrome, Plex Mono for data values.
+   Self-hosted by next/font — no runtime font request leaves the machine. */
+const sans = Instrument_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-sans' });
 const mono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-mono' });
 import { Header } from '../components/header';
 import { currentActor } from '../lib/actor';
