@@ -22,8 +22,8 @@
   --bad: #d96a6a;
   --bad-bg: #2b1719;
   --radius: 6px;
-  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: var(--font-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -71,8 +71,12 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 main {
   max-width: 1080px;
   margin: 0;
-  padding: 28px 36px 72px;
+  padding: 30px 40px 72px;
   min-width: 0;
+  /* A faint accent wash at the top gives the flat ground one degree of depth. */
+  background:
+    radial-gradient(52rem 18rem at 18% -6rem, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
+    var(--bg);
 }
 
 /* ------------------------------------------------------------ sidebar */
@@ -220,15 +224,55 @@ main {
 }
 .tool-card {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--panel);
-  padding: 16px 18px;
+  transition: border-color 130ms, transform 130ms, box-shadow 130ms;
 }
-.tool-card:hover { border-color: var(--line-strong); }
-.tool-card h2 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
-.tool-card h2 a { color: var(--text); }
-.tool-card h2 a:hover { color: var(--accent); text-decoration: none; }
-.tool-card p { margin: 0; }
+.tool-card > *, .tool-card-link { display: block; padding: 18px 20px; }
+.tool-card-link { color: inherit; }
+.tool-card-link:hover { text-decoration: none; }
+.tool-card:has(.tool-card-link):hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.28);
+}
+.tool-card h2 { margin: 0; font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em; }
+.tool-card p { margin: 8px 0 0; }
+
+.tool-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tool-card-arrow { color: var(--faint); transition: color 130ms, transform 130ms; }
+.tool-card:hover .tool-card-arrow { color: var(--accent); transform: translateX(2px); }
+
+.tool-card-stats {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+.tool-card-stats strong {
+  font: 600 13px var(--sans);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.tool-card-stats .stat-flag,
+.tool-card-stats .stat-flag strong { color: var(--bad); }
+
+.platform-card { background: color-mix(in srgb, var(--accent) 4%, var(--panel)); padding: 18px 20px; }
+.platform-card h2, .platform-card p { padding: 0; }
+.tool-card-denied { opacity: 0.75; }
+.tool-card-denied > * { padding: 0; }
+.tool-card-denied { padding: 18px 20px; }
+
+.hidden-tools { margin-top: 34px; }
+.hidden-tools > h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+.hidden-tools > .muted { margin: 0 0 14px; }
 
 /* ------------------------------------------------------------- stat strip */
 
