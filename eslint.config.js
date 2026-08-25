@@ -41,4 +41,22 @@ export default [
     files: ['packages/core/src/policy/**/*.ts', 'packages/core/src/index.ts'],
     rules: { 'no-restricted-syntax': 'off' },
   },
+  {
+    /**
+     * Two console files legitimately touch the claim set, and both are named here
+     * rather than working around the selectors, so the exemption is visible in review:
+     *
+     * - `policy-stub.ts` is a temporary local stand-in for packages/core/src/policy
+     *   (Session 1 is implementing the real one). It is the only place in the console
+     *   that decides anything, and it is deleted when core lands.
+     * - `session.ts` is the OIDC-shaped session issuer (§3.2). It mints and displays
+     *   the claim set — the role switcher has to show which roles you are carrying —
+     *   which is identity, not authorization.
+     */
+    files: [
+      'apps/console/src/core-adapter/policy-stub.ts',
+      'apps/console/src/lib/session.ts',
+    ],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
 ];
