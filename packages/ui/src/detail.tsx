@@ -27,7 +27,9 @@ export function Detail({ spec, row, labels }: DetailProps) {
                 <div key={field} className="detail-row">
                   <dt>{labels?.[field] ?? field}</dt>
                   <dd className={masked ? 'value masked' : 'value'}>
-                    {text}
+                    {field === 'status' || field === 'environment'
+                      ? <span className={`pill pill-${text}`}>{text}</span>
+                      : text}
                     {masked ? <span className="masked-tag" title="Masked by PII policy">masked</span> : null}
                   </dd>
                 </div>

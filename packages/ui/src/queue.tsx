@@ -88,6 +88,11 @@ export function Queue(props: QueueProps) {
                   <td key={column.field}>
                     {index === 0 ? (
                       <a href={`${basePath}/${encodeURIComponent(id)}`}>{cellText(row[column.field])}</a>
+                    ) : isEnumField(column.field) ? (
+                      /* Presentation only: state-like values read as chips, not prose. */
+                      <span className={`pill pill-${cellText(row[column.field])}`}>
+                        {cellText(row[column.field])}
+                      </span>
                     ) : (
                       cellText(row[column.field])
                     )}
@@ -108,6 +113,11 @@ export function Queue(props: QueueProps) {
       </p>
     </section>
   );
+}
+
+/** Fields whose values are a closed vocabulary; styled as chips. */
+function isEnumField(field: string): boolean {
+  return field === 'status' || field === 'environment' || field === 'state';
 }
 
 export function SlaBadge({ value, now }: { value: unknown; now: Date }) {
