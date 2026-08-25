@@ -107,6 +107,45 @@ their required permissions and approval rules, and PII visibility.
 The spec is TypeScript, not JSON or YAML. It typechecks against the schema, so a
 column rename breaks the build instead of breaking production at 2am.
 
+### 3.8 Identity binding at the external API boundary
+
+The "own the primitives, rent the UI" recommendation lives or dies on identity. A rented
+UI (Retool, Appsmith) conventionally reaches the data layer with a **service account**,
+which defeats every primitive above at once: `can()` scopes to a machine's roles, not a
+person's; the audit chain records `svc_retool` on every row. A log that names a service
+account is a log, not an audit trail.
+
+The full mechanism has two halves, and this repo implements exactly one of them:
+
+**Half 1 — the API boundary (implemented, `packages/core/src/assert/`).** Every request
+to the external surface (`/api/ext/[table]`) must carry a short-lived (60s), HMAC-signed
+assertion of the *human's* identity — `{ sub, email, roles, iat, exp }` — minted by the
+session issuer and verified by the data layer independently of the calling UI. The UI
+passes the token through; it cannot mint one (the signing secret never reaches it, and
+minting fails closed when `ITP_ASSERTION_SECRET` is unset), replay an expired one, or
+escalate one (tampering breaks the signature; an unknown role is refused even correctly
+signed). Every refusal is audited with `decision: 'deny'` — a rejected assertion is an
+attempted access, which is what an examiner wants on the chain. What this half **proves**:
+requests on this surface are attributable to a person, and audit rows name that person.
+The dev-only `?as=service` path is the control group: the same query succeeds as
+`svc_retool`, and the audit rows name the machine — that contrast is the demo, and a test
+asserts it.
+
+**Half 2 — the database boundary (not implemented, requires Postgres).** An assertion at
+the API layer binds identity only for callers who come through the API. A connection
+that reaches the database directly — the rented UI's native "data source", an analyst's
+psql — is bound by nothing here. Closing that requires Postgres row-level security keyed
+off a per-request session variable (`SET LOCAL app.actor_sub = …`), with the UI's
+database role restricted to security-definer functions so it cannot query tables raw.
+SQLite has no RLS and no roles, so this half **cannot exist in this prototype** and is
+not claimed. It is the pilot's Week-2 gate.
+
+The split is honest because the two halves fail independently: half 1 without half 2
+leaves the database naked to direct connections; half 2 without half 1 gives RLS nothing
+trustworthy to key on. This session proves the request-scoped identity plumbing —
+mint, verify, refuse, audit — which is the part that does not change shape when the
+database boundary arrives.
+
 ## 4. Verification harness (read this before opening a session)
 
 Devin's output quality is bounded by what the repo can prove about it. CI is seeded
