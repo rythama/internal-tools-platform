@@ -88,8 +88,14 @@ way," or a fix authored by hand. Zero is a legitimate result. So is six.
 | 1a | core primitives | 20:24 | — | — | — | — | — | **Operator-stopped** during an account migration. Not a Devin failure; draw no conclusion from this row. |
 | 2 | console shell | 20:24 | 20:33:40 | **9m 40s** | **0 min** | 0 | +2,923 | [PR #1](https://github.com/rythama/internal-tools-platform/pull/1). Merged 17s after opening — unread. |
 | 1b | core primitives | 20:53 | 21:00:06 | **7m 06s** | **5–10 min** | 0 | +2,228 | [PR #2](https://github.com/rythama/internal-tools-platform/pull/2). 216 tests. Reviewed, then merged. |
-| 3 | KYC review queue | | | | | | | not started |
-| 4 | refunds + flags | | | | | | | not started |
+| 3 | KYC review queue | 21:09 | 21:29:31 | **20m 31s** | **10–15 min** | 0 | +1,474 / −954 | [PR #3](https://github.com/rythama/internal-tools-platform/pull/3). Real core, stubs deleted, 2 of 4 named defects fixed. |
+| 4 | refunds + flags | — | — | — | — | — | — | **Deliberately not run.** It existed to measure marginal per-tool cost; the economic analysis already put that at parity with Power Apps, so the measurement no longer moves the recommendation. |
+
+**Totals: ~37 minutes of agent time, ~5,600 net lines, 211 tests. ~20–25 minutes of human
+review across three PRs, one of which got zero.**
+
+Review time rose with criticality — 0 → 5–10 → 10–15 minutes — which is the right direction
+and still an order of magnitude below what the volume warrants.
 
 ¹ ACU consumption for session 2 was lost when the account changed mid-run. Recorded as
 unavailable rather than estimated. The rate card itself was never obtained in writing, so any
