@@ -75,13 +75,21 @@ under-built and that is the signal to invest in core.
 
 ## Session log
 
-Filled in as sessions run — wall-clock, ACUs, PR link, and what needed human
-correction. The last column is the honest one, and it is the column the client's
-VP should care about most.
+Schema fixed **before** the first session, so the numbers are measured rather than
+reconstructed. `corrections` is the honest column and the one the client's VP should
+care about most: it is the only figure here that speaks to review load, and review
+load — not agent speed — is the binding constraint on this platform's economics.
 
-| # | Session | Wall-clock | ACUs | PR | Human corrections |
-|---|---|---|---|---|---|
-| 1 | core primitives | | | | |
-| 2 | console shell | | | | |
-| 3 | KYC review queue | | | | |
-| 4 | refunds + flags | | | | |
+A correction is any human intervention before merge: a redirect, a "no, do it this
+way," or a fix authored by hand. Zero is a legitimate result. So is six.
+
+| # | Session | Started | PR opened | Wall-clock | ACUs | Corrections | Net LOC | Notes |
+|---|---|---|---|---|---|---|---|---|
+| 1 | core primitives | 2026-08-24 20:24 | | | | | | running |
+| 2 | console shell | 2026-08-24 20:24 | | | | | | running, concurrent with 1 |
+| 3 | KYC review queue | | | | | | | not started |
+| 4 | refunds + flags | | | | | | | not started |
+
+Sessions 1 and 2 were launched concurrently against the same repo. Session 2 builds
+against a contract session 1 is implementing at the same time — whether that actually
+works is a finding, not an assumption, and it gets reported either way.
