@@ -16,6 +16,9 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run test
+      # Applies known-bad mutants to the controls and requires the suite to kill
+      # every one, so deleting a control's regression test fails CI.
+      - run: npm run test:mutation
       # Added after a merged PR broke `next build` while typecheck, lint and tests
       # all stayed green: core imported './x.js' from './x.ts', which TypeScript's
       # bundler resolution accepts and webpack does not. A harness only catches

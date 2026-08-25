@@ -64,7 +64,7 @@ export { requestApproval, castVote } from './approvals/index';
  * Reads. Every one of them masks before returning and none takes an `unmask`
  * parameter — see ./read for why that is the load-bearing property.
  */
-export { listRows, getRow, listAuditRows, listApprovals } from './read/index';
+export { listRows, getRow, listAuditRows, listApprovals, isKnownTable } from './read/index';
 
 /**
  * `revealRow` is the audited counterpart to `getRow`: same row, unmasked, gated by
@@ -72,6 +72,20 @@ export { listRows, getRow, listAuditRows, listApprovals } from './read/index';
  * `getApproval` resolves one pending approval so a voter can be told what they signed.
  */
 export { revealRow, getApproval } from './read/index';
+
+/**
+ * Identity binding at the external API boundary (§3.8): a short-lived, HMAC-signed
+ * assertion of the HUMAN's identity, minted by the session issuer and verified by
+ * the data layer independently of the calling UI. Refusals are audited as denials.
+ * `SERVICE_ACTOR` is the machine identity the contrast demo audits against.
+ */
+export {
+  mintAssertion,
+  verifyAssertion,
+  SERVICE_ACTOR,
+  ASSERTION_SECRET_ENV,
+  DEFAULT_ASSERTION_TTL_SECONDS,
+} from './assert/index';
 
 /**
  * The domain write path. A tool cannot reach `withAudit`'s transaction handle from

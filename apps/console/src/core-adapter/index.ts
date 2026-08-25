@@ -31,6 +31,10 @@ export const {
   recordDenial,
   policyAttrs,
   now,
+  isKnownTable,
+  mintAssertion,
+  verifyAssertion,
+  SERVICE_ACTOR,
 } = core;
 
 /**

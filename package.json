@@ -13,10 +13,11 @@
     "build": "npm run build -w @itp/console",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "test:mutation": "tsx scripts/mutate.ts",
     "lint": "eslint .",
     "db:seed": "test -f packages/core/src/db/seed.ts && tsx packages/core/src/db/seed.ts || echo '[skip] seed not implemented yet'",
     "audit:verify": "test -f packages/core/src/audit/verify-cli.ts && tsx packages/core/src/audit/verify-cli.ts || echo '[skip] audit verifier not implemented yet'",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run build && npm run audit:verify"
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run test:mutation && npm run build && npm run audit:verify"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.11",
