@@ -26,6 +26,7 @@ export function Sidebar({ actor, specs }: { actor: Actor; specs: readonly ToolSp
       </nav>
 
       <div className="sidebar-foot">
+        <div className="foot-label">Signed in as</div>
         <div className="identity" title={actor.sub}>
           <span className="identity-dot" aria-hidden="true" />
           {actor.email}
