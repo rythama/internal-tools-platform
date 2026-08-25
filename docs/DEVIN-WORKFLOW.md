@@ -91,11 +91,14 @@ way," or a fix authored by hand. Zero is a legitimate result. So is six.
 | 3 | KYC review queue | 21:09 | 21:29:31 | **20m 31s** | **10–15 min** | 0 | +1,474 / −954 | [PR #3](https://github.com/rythama/internal-tools-platform/pull/3). Real core, stubs deleted, 2 of 4 named defects fixed. |
 | 4 | refunds + flags | — | — | — | — | — | — | **Deliberately not run.** It existed to measure marginal per-tool cost; the economic analysis already put that at parity with Power Apps, so the measurement no longer moves the recommendation. |
 
-**Totals: ~37 minutes of agent time, ~5,600 net lines, 211 tests. ~20–25 minutes of human
-review across three PRs, one of which got zero.**
+**Totals: ~55 minutes of agent time across five sessions, ~6,400 net lines, 227 tests,
+$20.04 measured agent cost on the current account. ~30–40 minutes of human review across
+five PRs, one of which got zero.**
 
-Review time rose with criticality — 0 → 5–10 → 10–15 minutes — which is the right direction
-and still an order of magnitude below what the volume warrants.
+Review time rose with criticality — 0 → 5–10 → 10–15 → 10 minutes — the right direction,
+and still an order of magnitude below what the volume warrants. The mutation harness (PR #5)
+is the structural answer: the five invariants the original suite could not defend are now a
+CI gate that fails if any mutant survives.
 
 ¹ Session 2 ran on an account that was migrated away mid-exercise; its cost is lost and
 recorded as unavailable rather than estimated.
