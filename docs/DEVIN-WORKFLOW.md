@@ -89,16 +89,29 @@ way," or a fix authored by hand. Zero is a legitimate result. So is six.
 | 2 | console shell | 20:24 | 20:33:40 | **9m 40s** | **0 min** | 0 | +2,923 | [PR #1](https://github.com/rythama/internal-tools-platform/pull/1). Merged 17s after opening — unread. |
 | 1b | core primitives | 20:53 | 21:00:06 | **7m 06s** | **5–10 min** | 0 | +2,228 | [PR #2](https://github.com/rythama/internal-tools-platform/pull/2). 216 tests. Reviewed, then merged. |
 | 3 | KYC review queue | 21:09 | 21:29:31 | **20m 31s** | **10–15 min** | 0 | +1,474 / −954 | [PR #3](https://github.com/rythama/internal-tools-platform/pull/3). Real core, stubs deleted, 2 of 4 named defects fixed. |
-| 4 | refunds + flags | — | — | — | — | — | — | **Deliberately not run.** It existed to measure marginal per-tool cost; the economic analysis already put that at parity with Power Apps, so the measurement no longer moves the recommendation. |
+| 4 | refunds + flags | 21:40 | 21:49:30 | **9m 30s** | not separately timed | 0 | +644 | [PR #4](https://github.com/rythama/internal-tools-platform/pull/4), merged. Two tools: 146 spec / 107 custom / 36 core / 355 test lines. Found a real latent platform bug (attrs never passed to can(), so attribute-conditional rules denied everything). The one merge conflict of the exercise: both-sides-added barrel exports vs PR #6, resolved by a human in ~2 minutes. |
+| 5 | identity binding | 22:05 | 22:15:13 | **~11m** | exec-adversarial² | 0 | +615 | [PR #6](https://github.com/rythama/internal-tools-platform/pull/6), merged. Signed 60s human assertions; six forgery attempts refused under adversarial execution; human-vs-`svc_retool` contrast on the audit chain. |
+| 6 | mutation harness | ~21:52 | 21:59:39 | **~8m** | **10 min** | 0 | +143 | [PR #5](https://github.com/rythama/internal-tools-platform/pull/5), merged. All five known-bad mutants killed in CI; negative path verified against a deliberate no-op mutant. |
 
-**Totals: ~55 minutes of agent time across five sessions, ~6,400 net lines, 227 tests,
-$20.04 measured agent cost on the current account. ~30–40 minutes of human review across
-five PRs, one of which got zero.**
+² PR #6 was reviewed by execution rather than by reading: six forgery attempts (payload
+tamper, wrong secret, expiry, alg swap, unset secret, role escalation) were run against the
+branch before merge; all refused. Given this exercise's finding that reading does not catch
+one-conjunct errors, executing attacks is the review method that worked — and it is also a
+cost: someone has to write the attacks.
+
+**Final totals: ~66 minutes of agent time across six sessions, ~7,000 net lines, 228 tests
+plus a five-mutant CI gate, ~$27 measured agent cost on the current account. ~45–60 minutes
+of human and adversarial-execution review across six PRs, one of which got zero.**
 
 Review time rose with criticality — 0 → 5–10 → 10–15 → 10 minutes — the right direction,
 and still an order of magnitude below what the volume warrants. The mutation harness (PR #5)
 is the structural answer: the five invariants the original suite could not defend are now a
 CI gate that fails if any mutant survives.
+
+Postscript, recorded because it is the thesis in miniature: the first attempt to write this
+very table was clobbered by a scripting bug that printed "log updated" and wrote a stale
+buffer — caught only because the final read-through checked the file instead of the message.
+Fourth instance in one evening of a green signal standing in for a verified result.
 
 ¹ Session 2 ran on an account that was migrated away mid-exercise; its cost is lost and
 recorded as unavailable rather than estimated.
